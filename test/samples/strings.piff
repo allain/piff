@@ -1,0 +1,2 @@
+assert(0 + "1" + 2 + true === '012true', 'concat with string always does so')
+assert('sum ' + (1 + 2) === 'sum 3', 'concat an expression respects the expressions type')

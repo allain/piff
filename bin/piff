@@ -1,0 +1,15 @@
+#!/bin/env node
+const fs = require('fs')
+
+const transpile = require('..')
+
+const argv = require('minimist')(process.argv)
+const srcPath = argv._.find(path => path.match(/\.piff$/))
+
+let code = fs.readFileSync(srcPath, 'utf-8')
+let php = transpile(code)
+
+console.log('<?php')
+console.log('// piff: generated from ' + srcPath + ' ' + new Date())
+console.log(php)
+console.log('?>')

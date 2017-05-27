@@ -1,0 +1,19 @@
+{
+  "name": "piff",
+  "version": "0.1.0",
+  "main": "index.js",
+  "license": "MIT",
+  "bin": {
+    "piff": "./bin/piff"
+  },
+  "scripts": {
+    "build": "pegjs -o piff-parser.js piff.pegjs",
+    "build-samples": "for f in ./test/samples/*.piff; do ./bin/piff $f > $f.php ; done;",
+    "test": "tape test/**/*.test.js"
+  },
+  "dependencies": {
+    "minimist": "^1.2.0",
+    "pegjs": "^0.10.0",
+    "tape": "^4.6.3"
+  }
+}

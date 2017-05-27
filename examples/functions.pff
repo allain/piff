@@ -1,0 +1,9 @@
+x = 10
+y = 12
+
+test = fn () {
+  z = fn() { return y }
+  return x + z()
+}
+
+print(test())
