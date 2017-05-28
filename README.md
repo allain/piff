@@ -1,10 +1,11 @@
 # piff
 A language that compiles down to PHP.
 
-** piff is a work in progress, until 1.0 it's syntax might change **
+**Warning:** piff is a work in progress. Its syntax might change until version 1.0
 
 ## Why?
-PHP has warts, but it's also the foundation of many Legacy Systems (including one I have to maintain). This tool is my attempt to maintain my sanity in this light.
+
+PHP has warts; It's also the foundation of many Legacy Systems (including one I have to maintain). This tool is my attempt to maintain my sanity in this light.
 
 It has had a good number of language features bolted on over the years (Closures, OO, Traits, Namespaces, etc...) but, because of its syntax, it's hard to appreciate them.
 
