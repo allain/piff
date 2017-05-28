@@ -3,8 +3,8 @@ fn println(msg) {
 }
 
 class Person {
-  public first = ''
-  public last = ''
+  first = ''
+  last = ''
 
   Person(first, last) {
     @first = first
@@ -17,7 +17,7 @@ class Person {
 }
 
 class Adult extends Person {
-  public title = ''
+  title = ''
 
   Adult(title, first, name) {
     parent(first, name)
@@ -29,5 +29,5 @@ class Adult extends Person {
   }
 }
 
-allain = new Adult('Mr', 'Popo', 'Jijo')
-println(allain->fullName())
+adult = new Adult('Mr', 'Popo', 'Jijo')
+println(adult->fullName())
