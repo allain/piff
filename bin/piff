@@ -1,10 +1,21 @@
 #!/bin/env node
-const fs = require('fs')
-
 const transpile = require('..')
 
+const fs = require('fs')
 const argv = require('minimist')(process.argv)
+
+if (argv.h || argv.help) {
+  usage()
+  process.exit(0)
+}
+
 const srcPath = argv._.find(path => path.match(/\.piff$/))
+if (!srcPath) {
+  console.error('Error: no piff file given')
+  console.log()
+  usage()
+  process.exit(1)
+}
 
 let code = fs.readFileSync(srcPath, 'utf-8')
 let php = transpile(code)
@@ -13,3 +24,7 @@ console.log('<?php')
 console.log('// piff: generated from ' + srcPath + ' ' + new Date())
 console.log(php)
 console.log('?>')
+
+function usage() {
+  console.log('Usage: piff <path/to/file.piff> > output.php')
+}
