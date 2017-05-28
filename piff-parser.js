@@ -744,7 +744,7 @@ function peg$parse(input, options) {
               type: "PropertyDeclaration",
               id,
               value,
-              visibility: visibility ? visibility : 'public',
+              visibility: visibility ? visibility[0] : 'public',
               statik
             };
           },
@@ -9849,7 +9849,7 @@ function peg$parse(input, options) {
   }
 
   function peg$parsePropertyDeclaration() {
-    var s0, s1, s2, s3, s4, s5, s6, s7, s8;
+    var s0, s1, s2, s3, s4, s5, s6, s7, s8, s9;
 
     s0 = peg$currPos;
     s1 = peg$currPos;
@@ -9952,9 +9952,15 @@ function peg$parse(input, options) {
                 if (s7 !== peg$FAILED) {
                   s8 = peg$parsePrimaryExpression();
                   if (s8 !== peg$FAILED) {
-                    peg$savedPos = s0;
-                    s1 = peg$c356(s1, s2, s4, s8);
-                    s0 = s1;
+                    s9 = peg$parseEOS();
+                    if (s9 !== peg$FAILED) {
+                      peg$savedPos = s0;
+                      s1 = peg$c356(s1, s2, s4, s8);
+                      s0 = s1;
+                    } else {
+                      peg$currPos = s0;
+                      s0 = peg$FAILED;
+                    }
                   } else {
                     peg$currPos = s0;
                     s0 = peg$FAILED;

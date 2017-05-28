@@ -1,0 +1,33 @@
+fn println(msg) {
+  print(msg + '\n')
+}
+
+class Person {
+  public first = ''
+  public last = ''
+
+  Person(first, last) {
+    @first = first
+    @last = last
+  }
+
+  fullName() {
+    return @first + ' ' + @last
+  }
+}
+
+class Adult extends Person {
+  public title = ''
+
+  Adult(title, first, name) {
+    parent(first, name)
+    @title = title
+  }
+
+  fullName() {
+    return @title + ' ' + parent::fullName()
+  }
+}
+
+allain = new Adult('Mr', 'Popo', 'Jijo')
+println(allain->fullName())

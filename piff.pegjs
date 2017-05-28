@@ -952,12 +952,13 @@ PropertyDeclaration
     id:Identifier __
     "=" __
     value: PrimaryExpression
+    EOS
     {
       return {
         type: "PropertyDeclaration",
         id,
         value,
-        visibility: visibility ? visibility : 'public',
+        visibility: visibility ? visibility[0] : 'public',
         statik
       };
     }
