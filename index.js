@@ -3,6 +3,7 @@ const { parse } = require('./piff-parser.js')
 const Visitor = require('./lib/Visitor.js')
 
 const PropertyLiteralVisitor = require('./lib/visitors/PropertyLiteralVisitor.js')
+const ParentCallVisitor = require('./lib/visitors/ParentCallVisitor.js')
 const StringConcatVisitor = require('./lib/visitors/StringConcatVisitor.js')
 const NeedsVisitor = require('./lib/visitors/NeedsVisitor.js')
 const ScopeVisitor = require('./lib/visitors/ScopeVisitor.js')
@@ -24,6 +25,7 @@ function transpile (piff) {
     new StringConcatVisitor(),
     new NeedsVisitor(),
     new ScopeVisitor(),
+    new ParentCallVisitor(),
     new PHPGeneratorVisitor(),
     new Visitor({
       pre: {
@@ -37,14 +39,18 @@ function transpile (piff) {
   visitors.forEach(v => v.visitTree(parseTree))
 
   let php = parseTree.php
-    .replace(/;;+/g, ';')
-    .replace(/;\n;\n/, ';\n')
-    .replace(/;\)/g, ')')
-    .replace(/;->/g, '->')
-    .replace(/;::/g, '::')
-    .replace(/\}(\s)?(\n\s*)\}/, '}$2}') // remove line after last method declaration and end of class spec`
+  // .replace(/;;+/g, ';')
+  // .replace(/;\n;\n/, ';\n')
+  // .replace(/;\)/g, ')')
+  // .replace(/;,/g, ',')
+  // .replace(/;]/g, ']')
+  // .replace(/; ./g, '.')
+  // .replace(/;->/g, '->')
+  // .replace(/;::/g, '::')
+  // .replace(/\}(\s)?(\n\s*)\}/, '}$2}') // remove line after last method declaration and end of class spec`
 
-  return autoIndent(php).replace(/\n\n\n+/g, '\n\n')
+  // return autoIndent(php).replace(/\n\n\n+/g, '\n\n').replace(/\{\s+\}/g, '{}')
+  return php
 }
 
 function addIndent (line, indents) {

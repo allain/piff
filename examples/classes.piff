@@ -25,7 +25,7 @@ class Adult extends Person {
   }
 
   fullName() {
-    return @title + ' ' + parent::fullName()
+    return @title + ' ' + parent()
   }
 }
 

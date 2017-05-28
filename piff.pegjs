@@ -944,6 +944,15 @@ MethodDeclaration
       };
     }
 
+ClassConstDeclaration
+  = name:[A-Z]+ __ "=" __ value:PrimaryExpression EOS {
+    return {
+      type: 'ClassConstDeclaration',
+      name,
+      value
+    }
+  }
+
 PropertyDeclaration
   = visibility: (
       "private" __ /  "protected" __ / "public" __
@@ -1036,7 +1045,8 @@ ClassElements
     }
 
 ClassElement
-  = PropertyDeclaration
+  = ClassConstDeclaration
+  / PropertyDeclaration
   / MethodDeclaration
 
 SourceElements

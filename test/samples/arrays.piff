@@ -1,8 +1,0 @@
-emptyArray = []
-
-numbers = [1, 2, 3]
-
-strings = ['a', 'b', 'c']
-
-obj = ['a', 'b', 'c': ['d', true], e: false]
-
