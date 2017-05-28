@@ -414,8 +414,11 @@ MemberExpression
         }
     )
     tail:(
-        __ "[" __ property:Expression __ "]" {
-          return { property: property, computed: true };
+        __ "[]" {
+          return { array: true, computed: false};
+        }
+      / __ "[" __ property:Expression __ "]" {
+          return { property: property, array: true, computed: true };
         }
       / __ "->" __ property:IdentifierName __ args:Arguments {
           return { property, method: true, arguments: args, computed: false };
@@ -439,7 +442,8 @@ MemberExpression
           method: element.method,
           arguments: element.arguments,
           computed: element.computed,
-          statik: element.statik
+          statik: element.statik,
+          array: element.array
         };
       }, head);
     }

@@ -1,0 +1,15 @@
+// simple function
+fn add(a, b) {
+  return a + b
+}
+
+// anonymous function
+multiply = fn(a, b) {
+  return a * b
+}
+
+// anonymous function using external variables
+ticks = []
+tick = fn() {
+  ticks[] = mktime()
+}

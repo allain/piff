@@ -1,0 +1,11 @@
+println = fn (msg) {
+  print(msg + "\n")
+}
+
+a = [1, 2, 3]
+a = [1, '2', 3]
+
+// keys will be automatically wrapped to be a string
+a = [a: 1, "b": 2, c: [3, 4, 5]]
+
+println(a['c'][2]) // outputs 5

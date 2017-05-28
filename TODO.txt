@@ -1,0 +1,1 @@
+ensure [] always appear at the end of the LHS in assignment expressions: a[] = 10

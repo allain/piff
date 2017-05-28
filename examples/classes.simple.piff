@@ -1,0 +1,28 @@
+fn println(msg) {
+  print(msg + '\n')
+}
+
+class Person {
+  first = ''
+  last = ''
+
+  Person(first, last) {
+    @first = first
+    @last = last
+  }
+
+  fullName() {
+    return @first + ' ' + @last
+  }
+
+  // scope keywords are still supported
+  private static t() {
+    println('you got here?')
+  }
+}
+
+person = new Person('Popo', 'Jijo')
+
+println(person->fullName())
+
+// private static call is blocked Person::t()
