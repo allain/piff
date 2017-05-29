@@ -179,3 +179,10 @@ test('strings - concat with strings does not affect parens', t => {
   t.equal(php, '"1".(2+3)')
   t.end()
 })
+
+test('compose - supports using pipe operator "=>"', t => {
+  t.equal(transpile('a = 1; a => b(_)'), '$a=1;b($a)')
+  t.equal(transpile('a = 1; a => b(_) => c(_) => d(_)'), '$a=1;d(c(b($a)))')
+  t.equal(transpile('a = 1; a => b(_, _)'), '$a=1;b($a,$a)')
+  t.end()
+})

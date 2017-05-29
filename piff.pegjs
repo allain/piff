@@ -432,6 +432,9 @@ MemberExpression
       / __ "::" __ property:IdentifierName {
           return { property: property, statik: true, computed: false };
         }
+      / __ "=>" __ property:Expression {
+          return { property: property, compose: true, computed: true };
+        }
     )*
     {
       return tail.reduce(function(result, element) {
@@ -440,6 +443,7 @@ MemberExpression
           object: result,
           property: element.property,
           method: element.method,
+          compose: element.compose,
           arguments: element.arguments,
           computed: element.computed,
           statik: element.statik,
@@ -488,10 +492,10 @@ CallExpression
             computed: true
           };
         }
-      / __ "." __ property:IdentifierName {
+      / __ "->" __ property:IdentifierName {
           return {
             type: "MemberExpression",
-            property: property,
+            property,
             computed: false
           };
         }

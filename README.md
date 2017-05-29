@@ -20,10 +20,11 @@ If you sound out PHP it kinda sounds like Piff. In the same way that piff kinda 
 ## Features
 
 1. Semicolons are optional
-2. Use clauses are automatically inferred
-3. Defining classes is less verbose
-4. Defining arrays is less verbose
-5. ...
+1. Use clauses are automatically inferred
+1. Functions can be composed using a pipe syntax
+1. Defining classes is less verbose
+1. Defining arrays is less verbose
+1. ...
 
 ## A Quick Piff example that demonstrates some of its benefits
 
@@ -38,6 +39,12 @@ class A {
   say(m) { print(@prefix + m) }
 }
 
+// Shorthand for self::$field => @@field. Works for methods too @@method()
+class B {
+  static prefix = 'Hello: '
+  static say(m) { print(@@prefix + m) }
+}
+
 // named functions
 fn add(a, b) { return a + b }
 
@@ -47,6 +54,9 @@ mult = fn a(a, b) { return a * b }
 // Automatically figures out "use" clause
 ticks = []
 tick = fn() { ticks[] = mktime() }
+
+// function composition alternate syntax
+a() => b(_) => c(_) // same as: c(b(a()))
 ```
 
 ## Installation

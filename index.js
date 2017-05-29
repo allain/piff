@@ -9,6 +9,7 @@ const NeedsVisitor = require('./lib/visitors/NeedsVisitor.js')
 const ScopeVisitor = require('./lib/visitors/ScopeVisitor.js')
 const PHPGeneratorVisitor = require('./lib/visitors/PHPGeneratorVisitor.js')
 const FieldRefVisitor = require('./lib/visitors/FieldRefVisitor.js')
+const ComposeVisitor = require('./lib/visitors/ComposeVisitor.js')
 
 module.exports = transpile
 
@@ -22,6 +23,7 @@ function transpile (piff) {
   }
 
   let visitors = [
+    new ComposeVisitor(),
     new FieldRefVisitor(),
     new PropertyLiteralVisitor(),
     new StringConcatVisitor(),
