@@ -456,9 +456,26 @@ NewExpression
 
 CallExpression
   = head:(
-      callee:MemberExpression __ args:Arguments {
-        return { type: "CallExpression", callee: callee, arguments: args };
-      }
+       "@@" method:IdentifierName __ args:Arguments {
+          return {
+            type: "CallExpression", callee: {
+              type: 'MemberExpression',
+              object: {
+                type: 'Identifier',
+                name: 'self'
+              },
+              property: method,
+              method: true,
+              statik: true,
+              computed: false
+            },
+            arguments: args
+          }
+        }
+      /  callee:MemberExpression __ args:Arguments {
+          return { type: "CallExpression", callee: callee, arguments: args };
+        }
+
     )
     tail:(
         __ args:Arguments {
