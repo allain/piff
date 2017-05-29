@@ -1,4 +1,4 @@
-println = fn (msg) {
+fn println (msg) {
   print(msg + "\n")
 }
 

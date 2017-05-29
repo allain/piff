@@ -186,3 +186,22 @@ test('compose - supports using pipe operator "=>"', t => {
   t.equal(transpile('a = 1; a => b(_, _)'), '$a=1;b($a,$a)')
   t.end()
 })
+
+test('using $ at start of identifier is allowed', t => {
+  t.equal(transpile('$a=1'), '$a=1', 'simple assignment works')
+  t.equal(
+    transpile('$f=fn(){};f()'),
+    '$f=function(){};$f()',
+    'function assignment works'
+  )
+  t.equal(
+    transpile('a=1;a->$b()'),
+    '$a=1;$a->$b()',
+    'works when used to dynamically specify a method'
+  )
+  t.equal(
+    transpile('$b="a";a=1;f=fn(){a->$b()}'),
+    '$b="a";$a=1;$f=function()use($a,$b){$a->$b();}'
+  )
+  t.end()
+})

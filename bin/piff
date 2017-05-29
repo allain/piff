@@ -2,6 +2,7 @@
 const transpile = require('..')
 
 const fs = require('fs')
+const getStdin = require('get-stdin')
 const argv = require('minimist')(process.argv)
 
 if (argv.h || argv.help) {
@@ -10,21 +11,61 @@ if (argv.h || argv.help) {
 }
 
 const srcPath = argv._.find(path => path.match(/\.piff$/))
-if (!srcPath) {
-  console.error('Error: no piff file given')
-  console.log()
-  usage()
+
+if (process.stdin.isTTY) {
+  const srcPath = argv._.find(path => path.match(/\.piff$/))
+  if (!srcPath) {
+    console.error('Error: no piff file given')
+    console.log()
+    usage()
+    process.exit(1)
+  }
+
+  fs.readFile(srcPath, 'utf-8', handleReadCode)
+} else if (srcPath) {
+  console.error('Error: src file given when piping from stdin')
+  process.exit(1)
+} else {
+  // Source code is coming from stdin
+  getStdin().then(code => handleReadCode(null, code), handleReadCode)
+}
+
+const outputPath = argv.o || argv.output
+if (!process.stdout.isTTY && outputPath) {
+  console.error('Error: output file given when piping to stdout')
   process.exit(1)
 }
 
-let code = fs.readFileSync(srcPath, 'utf-8')
-let php = transpile(code)
+function handleReadCode (err, piffCode) {
+  if (err) {
+    console.error(err.message)
+    process.exit(1)
+  }
 
-console.log('<?php')
-console.log('// piff: generated from ' + srcPath + ' ' + new Date())
-console.log(php)
-console.log('?>')
+  let phpCode = compile(piffCode)
 
-function usage() {
-  console.log('Usage: piff <path/to/file.piff> > output.php')
+  if (outputPath) {
+    fs.writeFileSync(outputPath, phpCode)
+  } else {
+    console.log(phpCode)
+  }
+}
+
+function compile (code) {
+  let php = transpile(code)
+  let timestamp = '' + new Date()
+  return `<?php
+// piff: generated from ${srcPath} ${timestamp}
+${php}
+?>`
+}
+
+function usage () {
+  console.log('Usage: piff [options] [path/to/file.piff]')
+  console.log('Compiles piff file into PHP')
+  console.log()
+  console.log('options:')
+  console.log(
+    '  -o, --output=<FILE>         saves generated code into file. dumps to stdout if not given'
+  )
 }
