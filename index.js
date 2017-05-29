@@ -30,14 +30,14 @@ function transpile (piff) {
     new NeedsVisitor(),
     new ScopeVisitor(),
     new ParentCallVisitor(),
-    new PHPGeneratorVisitor(),
-    new Visitor({
+    new PHPGeneratorVisitor()
+    /* new Visitor({
       pre: {
         '*': n => {
           // console.log(n)
         }
       }
-    })
+    }) */
   ]
 
   visitors.forEach(v => v.visitTree(parseTree))

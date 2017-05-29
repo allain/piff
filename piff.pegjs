@@ -462,17 +462,15 @@ CallExpression
   = head:(
        "@@" method:IdentifierName __ args:Arguments {
           return {
-            type: "CallExpression", callee: {
-              type: 'MemberExpression',
-              object: {
-                type: 'Identifier',
-                name: 'self'
-              },
-              property: method,
-              method: true,
-              statik: true,
-              computed: false
+            type: 'MemberExpression',
+            object: {
+              type: 'Identifier',
+              name: 'self'
             },
+            property: method,
+            method: true,
+            statik: true,
+            computed: false,
             arguments: args
           }
         }

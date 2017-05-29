@@ -205,3 +205,10 @@ test('using $ at start of identifier is allowed', t => {
   )
   t.end()
 })
+
+test('support standard PHP static access', t => {
+  // t.equal(transpile('A::b()'), 'A::b()')
+  // t.equal(transpile('A::$b'), 'A::$b')
+  t.equal(transpile('A::B'), 'A::B')
+  t.end()
+})

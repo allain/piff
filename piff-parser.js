@@ -428,17 +428,15 @@ function peg$parse(input, options) {
       peg$c226 = peg$literalExpectation("@@", false),
       peg$c227 = function(method, args) {
                 return {
-                  type: "CallExpression", callee: {
-                    type: 'MemberExpression',
-                    object: {
-                      type: 'Identifier',
-                      name: 'self'
-                    },
-                    property: method,
-                    method: true,
-                    statik: true,
-                    computed: false
+                  type: 'MemberExpression',
+                  object: {
+                    type: 'Identifier',
+                    name: 'self'
                   },
+                  property: method,
+                  method: true,
+                  statik: true,
+                  computed: false,
                   arguments: args
                 }
               },

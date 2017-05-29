@@ -21,25 +21,34 @@ If you sound out PHP it kinda sounds like Piff. In the same way that piff kinda 
 
 1. Semicolons are optional
 1. Use clauses are automatically inferred
-1. Functions can be composed using a pipe syntax
+1. Functions can be composed using a special syntax
 1. Defining classes is less verbose
 1. Defining arrays is less verbose
 1. ...
 
 ## A Quick Piff example that demonstrates some of its benefits
 
-```
+```c
 // Calling Overriden methods with parent
-class A { say(m) { print(m) } }
-class B { say(m) { parent(m + '!') } }
+class A {
+  say(m) {
+    print(m)
+  }
+}
 
-// Shorthand for $this->a => @a
+class B extends A {
+  say(m) {
+    parent(m + '!')
+  }
+}
+
+// @a expands to $this->a
 class A {
   prefix = 'Hello: '
   say(m) { print(@prefix + m) }
 }
 
-// Shorthand for self::$field => @@field. Works for methods too @@method()
+// @@field expands to self::$field, @@m() expands to self::m()
 class B {
   static prefix = 'Hello: '
   static say(m) { print(@@prefix + m) }
@@ -67,6 +76,14 @@ npm install -g piff
 
 ## Usage
 
+### Progammatic usage
+```js
+const piff = require('piff')
+let php = piff("'hello' => echo(_ + '\n')")
+console.log(php) // <?php ... echo("hello" . "\n")?>
+```
+
+### Command line usage
 ```bash
 piff path/to/file.piff -o output.php
 ```
