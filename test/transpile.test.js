@@ -142,6 +142,22 @@ test('class - substitutes @ for this', t => {
   t.end()
 })
 
+test('class - substitutes @@prop for self::$prop', t => {
+  t.equal(
+    transpile('class A { A() { print(@@t) } }'),
+    'class A{public function A(){print(self::$t);}}'
+  )
+  t.end()
+})
+
+test.skip('TODO class - substitutes @@prop() for self::prop()', t => {
+  t.equal(
+    transpile('class A { A() { @@t() } }'),
+    'class A{public function A(){self::t();}}'
+  )
+  t.end()
+})
+
 test('class - @prop used as prop expands', t => {
   let php = transpile('class A { A() { print(@t) } }')
   t.equal(php, 'class A{public function A(){print($this->t);}}')
@@ -151,6 +167,14 @@ test('class - @prop used as prop expands', t => {
 test('class - @method used as function call expands', t => {
   let php = transpile('class A { A() { @t() } }')
   t.equal(php, 'class A{public function A(){$this->t();}}')
+  t.end()
+})
+
+test('class - @prop used in nested functions use $that->prop', t => {
+  t.equal(
+    transpile('class A { A() { f = fn() { print(@t) } } }'),
+    'class A{public function A(){$that=$this;$f=function()use($that){print($that->t);};}}'
+  )
   t.end()
 })
 
