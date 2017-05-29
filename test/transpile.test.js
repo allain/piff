@@ -132,10 +132,18 @@ test('class - substitutes @@prop for self::$prop', t => {
   t.end()
 })
 
-test('TODO class - substitutes @@prop() for self::prop()', t => {
+test('class - substitutes @@prop() for self::prop()', t => {
   t.equal(
     transpile('class A { A() { @@t() } }'),
     'class A{public function A(){self::t();}}'
+  )
+  t.end()
+})
+
+test('class - substitutes @@prop() used as expression as self::prop()', t => {
+  t.equal(
+    transpile('class A { A() { p(@@t()) } }'),
+    'class A{public function A(){p(self::t());}}'
   )
   t.end()
 })
