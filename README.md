@@ -56,7 +56,7 @@ ticks = []
 tick = fn() { ticks[] = mktime() }
 
 // function composition alternate syntax
-a() => b(_) => c(_) // same as: c(b(a()))
+a() => b(_) => c(_) // is the same as: c(b(a()))
 ```
 
 ## Installation
@@ -67,12 +67,11 @@ npm install -g piff
 
 ## Usage
 
-To Compile to PHP
 ```bash
-piff path/to/file.piff > output.php
+piff path/to/file.piff -o output.php
 ```
 
-To Run Directly
+### Plays nice with stdin/out too
 ```bash
-piff path/to/file.piff | php
+echo "print('hello')" | piff | php
 ```
