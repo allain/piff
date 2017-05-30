@@ -14,13 +14,7 @@ const ComposeVisitor = require('./lib/visitors/ComposeVisitor.js')
 module.exports = transpile
 
 function transpile (piff) {
-  let parseTree
-  try {
-    parseTree = parse(piff)
-  } catch (e) {
-    console.log(e)
-    return null
-  }
+  let parseTree = parse(piff)
 
   let visitors = [
     new ComposeVisitor(),

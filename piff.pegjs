@@ -1034,8 +1034,16 @@ FunctionExpression
     }
 
 FormalParameterList
-  = head:Identifier tail:(__ "," __ Identifier)* {
+  = head:FormalParameter tail:(__ "," __ FormalParameter)* {
       return buildList(head, tail, 3);
+    }
+
+FormalParameter
+  = id:Identifier __ "=" __ def:PrimaryExpression {
+      return { type: 'FormalParameter', id, def: def}
+    }
+  / id:Identifier {
+      return { type: 'FormalParameter', id }
     }
 
 FunctionBody

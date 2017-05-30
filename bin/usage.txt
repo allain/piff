@@ -1,0 +1,9 @@
+Usage: piff [options] [path/to/file-or-dir]
+
+Compiles piff into PHP
+
+options:
+  -o, --output=<FILE>       saves generated code into the file. dumps to stdout if not given
+                            Not compatible with --recursive option
+  -r, --recursive           compiles all .piff files into .php in a directory recursively
+  -w, --watch               watches the sources and recompiles when needed

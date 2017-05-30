@@ -3,6 +3,10 @@ fn add(a, b) {
   return a + b
 }
 
+fn div(n, d=1) {
+  return n / d
+}
+
 // anonymous function
 multiply = fn(a, b) {
   return a * b

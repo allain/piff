@@ -8,9 +8,21 @@ test('functions - simple named function', t => {
   t.end()
 })
 
+test('functions - named function with default param value', t => {
+  let php = transpile('fn x(a=1) {}')
+  t.equal(php, 'function x($a=1){}')
+  t.end()
+})
+
 test('functions - simple anonymous function', t => {
   let php = transpile('add = fn (a, b) { return a + b }')
   t.equal(php, '$add=function($a,$b){return $a+$b;}')
+  t.end()
+})
+
+test('functions - anonymous function ith default param value', t => {
+  let php = transpile('$x = fn(a=1) {}')
+  t.equal(php, '$x=function($a=1){}')
   t.end()
 })
 

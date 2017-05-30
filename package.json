@@ -4,10 +4,10 @@
   "main": "index.js",
   "license": "ISC",
   "bin": {
-    "piff": "./bin/piff"
+    "piff": "./bin/piff.js"
   },
   "watch": {
-    "test": "{src,test}/*.js"
+    "test": "{lib,test}/*.js"
   },
   "scripts": {
     "build": "pegjs -o piff-parser.js piff.pegjs",
@@ -15,7 +15,10 @@
     "watch": "npm-watch"
   },
   "dependencies": {
+    "fs-extra": "^3.0.1",
     "get-stdin": "^5.0.1",
+    "glob": "^7.1.2",
+    "glob-watcher": "^3.2.0",
     "minimist": "^1.2.0"
   },
   "devDependencies": {
