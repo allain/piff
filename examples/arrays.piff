@@ -10,5 +10,6 @@ a = [a: 1, "b": 2, 'c': 3]
 
 // nesting is supported
 a = [a: 1, b: 2, c: [3, 4, 5]]
-
 println(a['c'][2]) // outputs 5
+
+a = [b: [c: [d: 'e']]]

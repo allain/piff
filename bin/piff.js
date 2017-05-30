@@ -49,6 +49,9 @@ const echo = msg => {
 
 const ts = () => new Date().toISOString().substr(0, 16).replace('T', ' ')
 
+const fileModified = path =>
+  fs.stat(path).then(stats => stats.mtime.getTime(), err => 0)
+
 function run () {
   if (argv.h || argv.help) return Promise.resolve(USAGE)
 
@@ -60,14 +63,15 @@ function run () {
   const updateFile = (srcFilePath, forced) => {
     const outputFilePath = srcFilePath.replace(/[.]piff$/, '.php')
     const stats = forced
-      ? Promise.resolve([null, null])
-      : Promise.all([fs.stat(srcFilePath), fs.stat(outputFilePath)])
+      ? Promise.resolve([1, 0])
+      : Promise.all([fileModified(srcFilePath), fileModified(outputFilePath)])
 
-    return stats.then(([srcStat, outStat]) => {
-      if (srcStat && outStat.mtime > srcStat.mtime) {
+    return stats.then(([srcTime, outTime]) => {
+      if (srcTime <= outTime) {
         console.log(ts() + ' skipping ' + srcFilePath)
         return
       }
+
       return compileFile(srcFilePath)
         .then(phpCode => fs.writeFile(outputFilePath, phpCode))
         .then(() => {
@@ -88,14 +92,12 @@ function run () {
       })
 
       watcher.on('change', srcFilePath => {
-        console.log(ts(), 'changed', srcFilePath)
         // Need to delay to work around a timing issue with how vscode does its saves.
         // It appears that it truncates the file, then appends to it.
         setTimeout(() => updateFile(srcFilePath), 50)
       })
 
       watcher.on('add', srcFilePath => {
-        console.log(ts(), 'added', srcFilePath)
         updateFile(srcFilePath)
       })
 
