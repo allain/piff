@@ -55,7 +55,7 @@ const fileModified = path =>
 function run () {
   if (argv.h || argv.help) return Promise.resolve(USAGE)
 
-  const recursive = !!(argv.h || argv.recursive)
+  const recursive = !!(argv.r || argv.recursive)
   const watching = !!(argv.w || argv.watch)
 
   const srcDirPath = (argv._[0] || '').replace(/\/$/, '')
@@ -92,13 +92,17 @@ function run () {
       })
 
       watcher.on('change', srcFilePath => {
-        // Need to delay to work around a timing issue with how vscode does its saves.
-        // It appears that it truncates the file, then appends to it.
-        setTimeout(() => updateFile(srcFilePath), 50)
+        if (srcFilepath.match(/[.]piff$/)) {
+          // Need to delay to work around a timing issue with how vscode does its saves.
+          // It appears that it truncates the file, then appends to it.
+          setTimeout(() => updateFile(srcFilePath), 50)
+        }
       })
 
       watcher.on('add', srcFilePath => {
-        updateFile(srcFilePath)
+        if (srcFilePath.match(/[.]piff$/)) {
+          updateFile(srcFilePath)
+        }
       })
 
       return ts() + ' watching ' + srcDirPath
