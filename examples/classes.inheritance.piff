@@ -30,4 +30,4 @@ class Adult extends Person {
 }
 
 adult = new Adult('Mr', 'Popo', 'Jijo')
-println(adult->fullName())
+println(adult.fullName())

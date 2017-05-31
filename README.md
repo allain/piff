@@ -85,17 +85,17 @@ console.log(php) // <?php ... echo("hello" . "\n")?>
 
 ### Command line usage
 ```bash
-# compiling a single file
-piff path/to/file.piff -o output.php
+# compile ./file.piff to ./file.php
+piff ./file.piff
 
-# compiling a directory in place. X.piff => .piff
-piff path/to/dir --recursive
+# compile all piff files in a directory
+piff path/to/dir/
 
 # watch a directory and compile any .piff file that needs it
-piff path/to/dir --recursive --watch
+piff path/to/dir --watch
 
 # or with shorter params
-piff path/to/dir -r -w
+piff path/to/dir -w
 
 # Plays nice with stdin/out too
 echo "print('hello')" | piff | php

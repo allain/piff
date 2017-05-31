@@ -6,23 +6,22 @@
   "bin": {
     "piff": "./bin/piff.js"
   },
-  "watch": {
-    "test": "{lib,test}/*.js"
-  },
   "scripts": {
     "build": "pegjs -o piff-parser.js piff.pegjs",
-    "test": "tape test/**/*.test.js",
-    "watch": "npm-watch"
+    "test": "npm run build && tape test/**/*.test.js"
   },
   "dependencies": {
+    "flatten": "^1.0.2",
     "fs-extra": "^3.0.1",
     "get-stdin": "^5.0.1",
     "glob": "^7.1.2",
     "glob-watcher": "^3.2.0",
+    "lazy.js": "^0.5.0",
     "minimist": "^1.2.0"
   },
   "devDependencies": {
-    "npm-watch": "^0.1.9",
+    "@types/lazy.js": "^0.3.28",
+    "eslint": "^3.19.0",
     "pegjs": "^0.10.0",
     "tape": "^4.6.3"
   }

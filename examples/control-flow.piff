@@ -1,0 +1,10 @@
+println = fn(msg) { print(msg + '\n') }
+
+a = random() * 100
+if (a > 50) {
+  println('> 50')
+} else if (a < 50) {
+  println('< 50')
+} else {
+  println('exactly 50!?')
+}

@@ -67,10 +67,8 @@ test('NeedsVisitor - function arguments satisfy needs', t => {
 test('NeedsVisitor - function arguments on anonymous function satisfy needs', t => {
   let v = new NV()
 
-  let tree = parse('test = fn (x) { print (x)}')
-
+  let tree = parse('test = fn(x){ print (x) }')
   v.visitTree(tree)
-
   t.deepEqual(tree.needs, { test: true, print: false }, 'x is not needed')
 
   t.end()

@@ -1,31 +1,39 @@
 #!/bin/env node
-const transpile = require('..')
-const argv = require('minimist')(process.argv, {
-  boolean: ['w', 'watch', 'r', 'recursive']
-})
-argv._.splice(0, 2)
+/* eslint no-console: [0] */
 
 const watch = require('glob-watcher')
 const glob = require('glob')
 const fs = require('fs-extra')
+const flatten = require('flatten')
 const USAGE = fs.readFileSync(__dirname + '/usage.txt', 'utf-8')
 const getStdin = require('get-stdin')
+const argv = require('minimist')(process.argv, {
+  boolean: ['w', 'watch']
+})
+argv._.splice(0, 2)
 
-const checkIsDirectory = path =>
-  fs.stat(path).then(stat => {
-    if (!stat.isDirectory()) {
-      throw new Error('ERROR not a directory: ' + path)
-    }
-    return path
-  })
+const transpile = require('..')
 
-const checkIsFile = path =>
-  fs.stat(path).then(stat => {
-    if (!stat.isFile()) {
-      throw new Error('ERROR not a file: ' + path)
-    }
-    return path
-  })
+const bail = msg => {
+  console.error(msg)
+  process.exit(1)
+}
+
+const helping = !!(argv.h || argv.help)
+if (helping) {
+  console.log(USAGE)
+  process.exit(0)
+}
+
+const hasPatterns = argv._.length
+const watching = !!(argv.w || argv.watch)
+if (process.stdin.isTTY && !hasPatterns) {
+  bail('ERROR: no patterns given\n\n' + USAGE)
+} else if (!process.stdin.isTTY && hasPatterns) {
+  bail('ERROR: patterns given when reading from stdin\n\n' + USAGE)
+} else if (!process.stdin.isTTY && watching) {
+  bail('ERROR: cannot watch stdin\n\n' + USAGE)
+}
 
 const compileFile = path =>
   fs
@@ -40,109 +48,99 @@ const compileFile = path =>
 const compileStdin = () =>
   getStdin().then(transpile).then(php => `<?php\n${php}?>`)
 
-const bail = msg => Promise.reject(new Error(msg))
-
-const echo = msg => {
-  console.log(msg)
-  return msg
-}
-
 const ts = () => new Date().toISOString().substr(0, 16).replace('T', ' ')
 
 const fileModified = path =>
-  fs.stat(path).then(stats => stats.mtime.getTime(), err => 0)
+  fs.stat(path).then(stats => stats.mtime.getTime(), () => 0)
+
+const updateFile = (srcFilePath, forced) => {
+  const outputFilePath = srcFilePath.replace(/[.]piff$/, '.php')
+  const stats = forced
+    ? Promise.resolve([1, 0])
+    : Promise.all([fileModified(srcFilePath), fileModified(outputFilePath)])
+
+  return stats.then(([srcTime, outTime]) => {
+    if (srcTime <= outTime) {
+      console.log(ts(), 'skipped', srcFilePath)
+      return
+    }
+
+    return compileFile(srcFilePath)
+      .then(phpCode => fs.writeFile(outputFilePath, phpCode))
+      .then(() => {
+        console.log(ts(), 'updated', outputFilePath)
+      })
+      .catch(err => {
+        console.error(ts(), ' ERROR ', err)
+      })
+  })
+}
 
 function run () {
-  if (argv.h || argv.help) return Promise.resolve(USAGE)
+  if (!process.stdin.isTTY) return compileStdin().then(console.log)
 
-  const recursive = !!(argv.r || argv.recursive)
-  const watching = !!(argv.w || argv.watch)
+  return Promise.all(
+    argv._.map(pattern =>
+      fs
+        .stat(pattern)
+        .then(
+          stat =>
+            (stat.isDirectory()
+              ? pattern.replace(/\/$/, '') + '/**/*.piff'
+              : pattern)
+        )
+    )
+  ).then(
+    srcPatterns =>
+      (watching ? watchPatterns(srcPatterns) : compilePatterns(srcPatterns))
+  )
+}
 
-  const srcDirPath = (argv._[0] || '').replace(/\/$/, '')
+function watchPatterns (patterns) {
+  const watcher = watch(patterns, {
+    ignoreInitial: false,
+    delay: 500
+  })
 
-  const updateFile = (srcFilePath, forced) => {
-    const outputFilePath = srcFilePath.replace(/[.]piff$/, '.php')
-    const stats = forced
-      ? Promise.resolve([1, 0])
-      : Promise.all([fileModified(srcFilePath), fileModified(outputFilePath)])
+  watcher.on('change', srcFilePath => {
+    if (srcFilePath.match(/[.]piff$/)) {
+      // Need to delay to work around a timing issue with how vscode does its saves.
+      // It appears that it truncates the file, then appends to it.
+      setTimeout(() => updateFile(srcFilePath), 50)
+    }
+  })
 
-    return stats.then(([srcTime, outTime]) => {
-      if (srcTime <= outTime) {
-        console.log(ts() + ' skipping ' + srcFilePath)
-        return
-      }
+  watcher.on('add', srcFilePath => {
+    if (srcFilePath.match(/[.]piff$/)) {
+      updateFile(srcFilePath)
+    }
+  })
 
-      return compileFile(srcFilePath)
-        .then(phpCode => fs.writeFile(outputFilePath, phpCode))
-        .then(() => {
-          console.log(ts() + ' updated', outputFilePath)
-        })
-        .catch(err => {
-          console.error(ts() + ' ERROR ' + err)
-        })
-    })
-  }
+  console.log(ts() + ' watching ' + patterns.join(' '))
+}
 
-  if (recursive && watching) {
-    return checkIsDirectory(srcDirPath).then(srcDirPath => {
-      // remove last slash on directory
-      const watcher = watch([srcDirPath + '/**/*.piff'], {
-        ignoreInitial: false,
-        delay: 500
-      })
-
-      watcher.on('change', srcFilePath => {
-        if (srcFilepath.match(/[.]piff$/)) {
-          // Need to delay to work around a timing issue with how vscode does its saves.
-          // It appears that it truncates the file, then appends to it.
-          setTimeout(() => updateFile(srcFilePath), 50)
-        }
-      })
-
-      watcher.on('add', srcFilePath => {
-        if (srcFilePath.match(/[.]piff$/)) {
-          updateFile(srcFilePath)
-        }
-      })
-
-      return ts() + ' watching ' + srcDirPath
-    })
-  } else if (recursive) {
-    // Compile all app files in the src directory
-    return checkIsDirectory(srcDirPath).then(srcDirPath => {
-      return new Promise((resolve, reject) => {
-        glob(srcDirPath + '/**/*.piff', (err, srcFiles) => {
+function compilePatterns (patterns) {
+  // Compile all app files in the src directory
+  return Promise.all(
+    patterns.map(pattern => {
+      return new Promise(resolve => {
+        glob(pattern, (err, srcFiles) => {
           Promise.all(srcFiles.map(f => updateFile(f, true))).then(
-            results => resolve(ts() + ' ' + results.length + ' files compiled'),
-            reject
+            () => resolve(srcFiles),
+            err => {
+              console.error(err)
+              resolve()
+            }
           )
         })
       })
     })
-  } else {
-    // compiling a single file
-    const srcFilePath = argv._[0]
-    if (process.stdin.isTTY && !srcFilePath) {
-      return bail('ERROR: no piff file given\n\n' + USAGE)
-    }
-
-    const outputFilePath = argv.o || argv.output
-    if (!process.stdout.isTTY && outputFilePath) {
-      return bail('ERROR: output file given when piping to stdout')
-    }
-
-    const emitCode = phpCode =>
-      (outputFilePath
-        ? fs.writeFile(outputFilePath, phpCode)
-        : console.log(phpCode))
-
-    return (process.stdin.isTTY
-      ? checkIsFile(srcFilePath).then(compileFile)
-      : compileStdin()).then(emitCode)
-  }
+  ).then(compiles => {
+    console.log(ts() + ' ' + flatten(compiles).length + ' files compiled')
+  })
 }
 
-run().then(
+Promise.resolve().then(run).then(
   msg => {
     if (msg) console.log(msg)
   },

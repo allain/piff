@@ -1,6 +1,6 @@
 const { parse } = require('./piff-parser.js')
 
-const Visitor = require('./lib/Visitor.js')
+const format = require('./lib/format.js')
 
 const PropertyLiteralVisitor = require('./lib/visitors/PropertyLiteralVisitor.js')
 const ParentCallVisitor = require('./lib/visitors/ParentCallVisitor.js')
@@ -12,6 +12,20 @@ const FieldRefVisitor = require('./lib/visitors/FieldRefVisitor.js')
 const ComposeVisitor = require('./lib/visitors/ComposeVisitor.js')
 
 module.exports = transpile
+
+const push = (arr, item) => {
+  arr.push(item)
+  return arr
+}
+
+const flatten = (arr, result = []) => {
+  if (Array.isArray(arr)) {
+    arr.map(item => flatten(item, result))
+    return result
+  } else {
+    return push(result, arr)
+  }
+}
 
 function transpile (piff) {
   let parseTree = parse(piff)
@@ -29,5 +43,5 @@ function transpile (piff) {
 
   visitors.forEach(v => v.visitTree(parseTree))
 
-  return parseTree.php
+  return format(parseTree.php)
 }

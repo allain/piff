@@ -3,7 +3,7 @@ fn println (msg) {
 }
 
 a = [1, 2, 3]
-a = [1, '2', 3]
+a = [1, '2', 3, 4]
 
 // keys will be treated as strings
 a = [a: 1, "b": 2, 'c': 3]
@@ -13,3 +13,4 @@ a = [a: 1, b: 2, c: [3, 4, 5]]
 println(a['c'][2]) // outputs 5
 
 a = [b: [c: [d: 'e']]]
+var_dump(a)

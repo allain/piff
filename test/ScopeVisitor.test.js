@@ -45,28 +45,22 @@ test('ScopeVisitor - sets uses property on anonymous functions', t => {
   let nv = new NV()
   let v = new SV()
 
-  let tree = parse(
-    `x = 10
-     test = fn () {
-       z = 20
-       y = fn() {
-         print(x)
-         print(z)
-       }
-     }
-     `
-  )
+  let tree
+  try {
+    tree = parse(`x = 10; test= fn(){z=20\nprint(x)} `)
+  } catch (e) {
+    t.fail(e)
+    return
+  }
 
   nv.visitTree(tree)
   v.visitTree(tree)
-
   new Visitor({
     post: {
       FunctionExpression: n => {
-        // console.log(n)
+        t.deepEqual(n.used, ['x'])
+        t.end()
       }
     }
   }).visitTree(tree)
-
-  t.end()
 })

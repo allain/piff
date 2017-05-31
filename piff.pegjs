@@ -360,9 +360,8 @@ PrimaryExpression
   = Identifier
   / Literal
   / ArrayLiteral
-  / ObjectLiteral
-  / start: "(" __ expression:Expression __ end:")" {
-    expression.parens = !!start
+  / "(" __ expression:Expression __ ")" !"->"{
+    expression.parens =  true
     return expression;
   }
 
@@ -372,15 +371,6 @@ ArrayLiteral
        return { type: "ObjectExpression", properties: properties };
      }
   / "[" __ properties:PropertyNameAndValueList __ "," __ "]" {
-       return { type: "ObjectExpression", properties: properties };
-     }
-
-ObjectLiteral
-  = "{" __ "}" { return { type: "ObjectExpression", properties: [] }; }
-  / "{" __ properties:PropertyNameAndValueList __ "}" {
-       return { type: "ObjectExpression", properties: properties };
-     }
-  / "{" __ properties:PropertyNameAndValueList __ "," __ "}" {
        return { type: "ObjectExpression", properties: properties };
      }
 
@@ -407,8 +397,8 @@ PropertySetParameterList
 
 MemberExpression
   = head:(
-        PrimaryExpression
-      / FunctionExpression
+        FunctionExpression
+      / PrimaryExpression
       / NewToken __ callee:MemberExpression __ args:Arguments {
           return { type: "NewExpression", callee: callee, arguments: args };
         }
@@ -420,10 +410,10 @@ MemberExpression
       / __ "[" __ property:Expression __ "]" {
           return { property: property, array: true, computed: true };
         }
-      / __ "->" __ property:IdentifierName __ args:Arguments {
+      / __ "." __ property:IdentifierName __ args:Arguments {
           return { property, method: true, arguments: args, computed: false };
         }
-      / __ "->" __ property:IdentifierName {
+      / __ "." __ property:IdentifierName {
           return { property, computed: false };
         }
       / __ "::" __ property:IdentifierName __ args:Arguments {
@@ -432,7 +422,7 @@ MemberExpression
       / __ "::" __ property:IdentifierName {
           return { property: property, statik: true, computed: false };
         }
-      / __ "=>" __ property:Expression {
+      / __ "|>" __ property:Expression {
           return { property: property, compose: true, computed: true };
         }
     )*
@@ -490,7 +480,7 @@ CallExpression
             computed: true
           };
         }
-      / __ "->" __ property:IdentifierName {
+      / __ "." __ property:IdentifierName {
           return {
             type: "MemberExpression",
             property,
@@ -941,9 +931,9 @@ FunctionDeclaration
     {
       return {
         type: "FunctionDeclaration",
-        id: id,
         params: optionalList(extractOptional(params, 0)),
-        body: body
+        body,
+        id
       };
     }
 
