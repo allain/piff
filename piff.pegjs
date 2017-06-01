@@ -76,6 +76,12 @@ SingleLineComment
 Identifier
   = !ReservedWord name:IdentifierName { return name; }
 
+Variable
+  = !ReservedWord name:IdentifierName {
+    name.type = "Variable";
+    return name
+  }
+
 IdentifierName "identifier"
   = head:IdentifierStart tail:IdentifierPart* {
       return {
@@ -357,7 +363,7 @@ EOF
 // ----- Expressions -----
 
 PrimaryExpression
-  = Identifier
+  = Variable
   / Literal
   / ArrayLiteral
   / "(" __ expression:Expression __ ")" !"->"{
@@ -410,16 +416,16 @@ MemberExpression
       / __ "[" __ property:Expression __ "]" {
           return { property: property, array: true, computed: true };
         }
-      / __ "." __ property:IdentifierName __ args:Arguments {
+      / __ "." __ property:Identifier __ args:Arguments {
           return { property, method: true, arguments: args, computed: false };
         }
-      / __ "." __ property:IdentifierName {
+      / __ "." __ property:Identifier {
           return { property, computed: false };
         }
-      / __ "::" __ property:IdentifierName __ args:Arguments {
+      / __ "::" __ property:Identifier __ args:Arguments {
           return { property, method: true, arguments: args, statik: true, computed: false };
         }
-      / __ "::" __ property:IdentifierName {
+      / __ "::" __ property:Identifier {
           return { property: property, statik: true, computed: false };
         }
       / __ "|>" __ property:Expression {
@@ -450,7 +456,7 @@ NewExpression
 
 CallExpression
   = head:(
-       "@@" method:IdentifierName __ args:Arguments {
+       "@@" method:Identifier __ args:Arguments {
           return {
             type: 'MemberExpression',
             object: {
@@ -480,7 +486,7 @@ CallExpression
             computed: true
           };
         }
-      / __ "." __ property:IdentifierName {
+      / __ "." __ property:Identifier {
           return {
             type: "MemberExpression",
             property,
@@ -774,7 +780,7 @@ IterationStatement
       return { type: "WhileStatement", body, test }
     }
   / ForEachToken __ "(" __ collection:Expression __
-    AsToken __ key:Identifier __ "=>" __ value:Identifier __ ")" __ body:Statement {
+    AsToken __ key:Variable __ "=>" __ value:Variable __ ")" __ body:Statement {
       return { type: "ForEachStatement", collection, key, value, body }
     }
   / ForEachToken __ "(" __ collection:Expression __ AsToken __ value:Expression __ ")" __ body:Statement {
@@ -897,7 +903,7 @@ TryStatement
     }
 
 Catch
-  = CatchToken __ "(" __ paramClass:Identifier __ param:Identifier __ ")" __ body:Block {
+  = CatchToken __ "(" __ paramClass:Identifier __ param:Variable __ ")" __ body:Block {
       return {
         type: "CatchClause",
         param,
@@ -958,7 +964,7 @@ PropertyDeclaration
       "private" __ /  "protected" __ / "public" __
     )?
     statik: "static"? __
-    id:Identifier __
+    id:Variable __
     "=" __
     value: PrimaryExpression
     EOS
@@ -1016,10 +1022,10 @@ FormalParameterList
     }
 
 FormalParameter
-  = id:Identifier __ "=" __ def:PrimaryExpression {
+  = id:Variable __ "=" __ def:PrimaryExpression {
       return { type: 'FormalParameter', id, def: def}
     }
-  / id:Identifier {
+  / id:Variable {
       return { type: 'FormalParameter', id }
     }
 

@@ -59,7 +59,7 @@ test('NeedsVisitor - function arguments satisfy needs', t => {
 
   v.visitTree(tree)
 
-  t.deepEqual(tree.needs, { test: false, print: false }, 'x is not needed')
+  t.deepEqual(tree.needs, { print: false }, 'x is not needed')
 
   t.end()
 })

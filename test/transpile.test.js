@@ -5,6 +5,11 @@ const rawTranspile = require('..')
 // only test the file without white space in it
 const transpile = piff => rawTranspile(piff).replace(/\n\s*/g, '')
 
+test('variables - property access does not turn into variables', t => {
+  t.equal(transpile('a = null; a.b = 1'), '$a = null;$a->b = 1')
+  t.end()
+})
+
 test('functions - simple named function', t => {
   let php = transpile('fn add(a, b) { return a + b }')
   t.equal(php, 'function add($a, $b) {return $a + $b;}')
@@ -247,7 +252,7 @@ test('using $ at start of identifier is allowed', t => {
     'works when used to dynamically specify a method'
   )
   t.equal(
-    transpile('$b="a";a=1;f=fn() { return a.b()}'),
+    transpile('$b="a";a=1;f=fn() { return a.$b()}'),
     '$b = "a";$a = 1;$f = function () use ($a, $b) {return $a->$b();}'
   )
   t.end()
