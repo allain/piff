@@ -202,6 +202,38 @@ test('compose - supports using pipe operator "=>"', t => {
   t.end()
 })
 
+test('foreach - handles only values case', t => {
+  t.equal(
+    transpile('foreach([] as v) { print(v);}'),
+    'foreach ([] as $v) {print($v);}'
+  )
+  t.end()
+})
+
+test('foreach - handles key and values case', t => {
+  t.equal(
+    transpile('foreach([] as k => v) { print(k, v);}'),
+    'foreach ([] as $k => $v) {print($k, $v);}'
+  )
+  t.end()
+})
+
+test('trycatch - handle try catch case', t => {
+  t.equal(
+    rawTranspile('try {a() } catch(E e) { b() }'),
+    'try {\n  a();\n} catch (E $e) {\n  b();\n}'
+  )
+  t.end()
+})
+
+test('trycatch - handle try finally case', t => {
+  t.equal(
+    rawTranspile('try {a() } finally { b() }'),
+    'try {\n  a();\n} finally {\n  b();\n}'
+  )
+  t.end()
+})
+
 test('using $ at start of identifier is allowed', t => {
   t.equal(transpile('$a=1'), '$a = 1', 'simple assignment works')
   t.equal(

@@ -767,40 +767,26 @@ IfStatement
 IterationStatement
   = DoToken __
     body:Statement __
-    WhileToken __ "(" __ test:Expression __ ")" EOS
-    { return { type: "DoWhileStatement", body: body, test: test }; }
-  / WhileToken __ "(" __ test:Expression __ ")" __
-    body:Statement
-    { return { type: "WhileStatement", test: test, body: body }; }
-  / ForEachToken __
-    "(" __
-    collection:Expression __
-    AsToken __
-    value:Expression __
-    ")" __
-    body:Statement
-    {
-      return {
-        type: "ForEachStatement",
-        collection,
-        value,
-        body
-      };
+    WhileToken __ "(" __ test:Expression __ ")" EOS {
+      return { type: "DoWhileStatement", body, test }
     }
-  / ForToken __
-    "(" __
-    init:(Expression __)? ";" __
-    test:(Expression __)? ";" __
-    update:(Expression __)?
-    ")" __
-    body:Statement
-    {
+  / WhileToken __ "(" __ test:Expression __ ")" __ body:Statement {
+      return { type: "WhileStatement", body, test }
+    }
+  / ForEachToken __ "(" __ collection:Expression __
+    AsToken __ key:Identifier __ "=>" __ value:Identifier __ ")" __ body:Statement {
+      return { type: "ForEachStatement", collection, key, value, body }
+    }
+  / ForEachToken __ "(" __ collection:Expression __ AsToken __ value:Expression __ ")" __ body:Statement {
+      return { type: "ForEachStatement", collection, value, body }
+    }
+  / ForToken __ "(" __ init:(Expression __)? ";" __ test:(Expression __)? ";" __ update:(Expression __)? ")" __ body:Statement {
       return {
         type: "ForStatement",
         init: extractOptional(init, 0),
         test: extractOptional(test, 0),
         update: extractOptional(update, 0),
-        body: body
+        body
       };
     }
 
@@ -911,11 +897,12 @@ TryStatement
     }
 
 Catch
-  = CatchToken __ "(" __ param:Identifier __ ")" __ body:Block {
+  = CatchToken __ "(" __ paramClass:Identifier __ param:Identifier __ ")" __ body:Block {
       return {
         type: "CatchClause",
-        param: param,
-        body: body
+        param,
+        paramClass,
+        body
       };
     }
 
