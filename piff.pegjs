@@ -1028,7 +1028,13 @@ FormalParameterList
     }
 
 FormalParameter
-  = id:Variable __ "=" __ def:PrimaryExpression {
+  = kind:Identifier __ id:Variable __ "=" __ def:PrimaryExpression {
+      return { type: 'FormalParameter', kind, id, def}
+    }
+  / kind:Identifier __ id:Variable {
+      return { type: 'FormalParameter', kind, id }
+    }
+  / id:Variable __ "=" __ def:PrimaryExpression {
       return { type: 'FormalParameter', id, def}
     }
   / id:Variable {

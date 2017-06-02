@@ -27,6 +27,12 @@ test('functions - named function with default param value', t => {
   t.end()
 })
 
+test('functions - named function with type specified for param value', t => {
+  let php = transpile('fn x(array a) {}')
+  t.equal(php, 'function x(array $a) {}')
+  t.end()
+})
+
 test('functions - simple anonymous function', t => {
   let php = transpile('add = fn(a, b) { return a + b }')
   t.equal(php, '$add = function ($a, $b) {return $a + $b;}')
@@ -87,6 +93,12 @@ test('class - simple works', t => {
 test('class - methods can be declared', t => {
   let php = transpile('class A { a() {} }')
   t.equal(php, 'class A {public function a() {}}')
+  t.end()
+})
+
+test('class - methods with argument types can be declared', t => {
+  let php = transpile('class A { a(B b) {} }')
+  t.equal(php, 'class A {public function a(B $b) {}}')
   t.end()
 })
 
