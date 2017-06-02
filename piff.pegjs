@@ -81,6 +81,24 @@ Variable
     return name
   }
 
+Constant
+  = !ReservedWord head:ConstantStart tail:ConstantPart+ {
+    return {
+      type: "Identifier",
+      name: head + tail.join("")
+    };
+  }
+
+ConstantStart
+  = Lu
+  / "_"
+
+ConstantPart
+  = Lu
+  / UnicodeDigit
+  / "_"
+
+
 IdentifierName "identifier"
   = head:IdentifierStart tail:IdentifierPart* {
       return {

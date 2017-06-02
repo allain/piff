@@ -16,6 +16,13 @@ test('variables - arguments may not be anything other than a variable', t => {
   t.end()
 })
 
+test('constants - are untouched', t => {
+  t.equal(transpile('__DIR__'), '__DIR__')
+  t.equal(transpile('__FILE__'), '__FILE__')
+  t.equal(transpile('t(CONSTANT)'), 't(CONSTANT)')
+  t.end()
+})
+
 test('functions - simple named function', t => {
   let php = transpile('fn add(a, b) { return a + b }')
   t.equal(php, 'function add($a, $b) {return $a + $b;}')

@@ -8,7 +8,7 @@ const flatten = require('flatten')
 const USAGE = fs.readFileSync(__dirname + '/usage.txt', 'utf-8')
 const getStdin = require('get-stdin')
 const argv = require('minimist')(process.argv, {
-  boolean: ['w', 'watch']
+  boolean: ['w', 'watch', 'f', 'force']
 })
 argv._.splice(0, 2)
 
@@ -27,6 +27,8 @@ if (helping) {
 
 const hasPatterns = argv._.length
 const watching = !!(argv.w || argv.watch)
+const forced = !!(argv.f || argv.forced)
+
 if (process.stdin.isTTY && !hasPatterns) {
   bail('ERROR: no patterns given\n\n' + USAGE)
 } else if (!process.stdin.isTTY && hasPatterns) {
@@ -92,7 +94,9 @@ function run () {
     )
   ).then(
     srcPatterns =>
-      (watching ? watchPatterns(srcPatterns) : compilePatterns(srcPatterns))
+      (watching
+        ? watchPatterns(srcPatterns)
+        : compilePatterns(srcPatterns, forced))
   )
 }
 
@@ -106,7 +110,7 @@ function watchPatterns (patterns) {
     if (srcFilePath.match(/[.]piff$/)) {
       // Need to delay to work around a timing issue with how vscode does its saves.
       // It appears that it truncates the file, then appends to it.
-      setTimeout(() => updateFile(srcFilePath), 50)
+      setTimeout(() => updateFile(srcFilePath, true), 50)
     }
   })
 
@@ -119,13 +123,13 @@ function watchPatterns (patterns) {
   console.log(ts() + ' watching ' + patterns.join(' '))
 }
 
-function compilePatterns (patterns) {
+function compilePatterns (patterns, forced) {
   // Compile all app files in the src directory
   return Promise.all(
     patterns.map(pattern => {
       return new Promise(resolve => {
         glob(pattern, (err, srcFiles) => {
-          Promise.all(srcFiles.map(f => updateFile(f, true))).then(
+          Promise.all(srcFiles.map(f => updateFile(f, forced))).then(
             () => resolve(srcFiles),
             err => {
               console.error(err)
