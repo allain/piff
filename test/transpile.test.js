@@ -10,6 +10,11 @@ test('variables - property access does not turn into variables', t => {
   t.end()
 })
 
+test('variables - arguments may not be anything other than a variable', t => {
+  t.equal(transpile('a(b)'), 'a($b)')
+  t.end()
+})
+
 test('functions - simple named function', t => {
   let php = transpile('fn add(a, b) { return a + b }')
   t.equal(php, 'function add($a, $b) {return $a + $b;}')
@@ -190,13 +195,13 @@ test('class - @prop used in nested functions use $that->prop', t => {
 
 test('strings - concat with many types and an string uses string concat', t => {
   let php = transpile('1 + "2" + 3')
-  t.equal(php, '1."2".3')
+  t.equal(php, '1 . "2" . 3')
   t.end()
 })
 
 test('strings - concat with strings does not affect parens', t => {
   let php = transpile('"1" + (2 + 3)')
-  t.equal(php, '"1".(2 + 3)')
+  t.equal(php, '"1" . (2 + 3)')
   t.end()
 })
 
@@ -242,7 +247,7 @@ test('trycatch - handle try finally case', t => {
 test('using $ at start of identifier is allowed', t => {
   t.equal(transpile('$a=1'), '$a = 1', 'simple assignment works')
   t.equal(
-    transpile('$f = fn() {}; f()'),
+    transpile('$f = fn() {}; $f()'),
     '$f = function () {};$f()',
     'function assignment works'
   )

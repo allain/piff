@@ -31,11 +31,7 @@ test('NeedsVisitor - treats function calls to undefined vars as undefined needed
 
   v.visitTree(tree)
 
-  t.deepEqual(
-    tree.needs,
-    { print: false },
-    'sets need for global function call'
-  )
+  t.deepEqual(tree.needs, {}, 'sets need for global function call')
 
   t.end()
 })
@@ -59,7 +55,7 @@ test('NeedsVisitor - function arguments satisfy needs', t => {
 
   v.visitTree(tree)
 
-  t.deepEqual(tree.needs, { print: false }, 'x is not needed')
+  t.deepEqual(tree.needs, {}, 'x is not needed')
 
   t.end()
 })
@@ -69,7 +65,7 @@ test('NeedsVisitor - function arguments on anonymous function satisfy needs', t 
 
   let tree = parse('test = fn(x){ print (x) }')
   v.visitTree(tree)
-  t.deepEqual(tree.needs, { test: true, print: false }, 'x is not needed')
+  t.deepEqual(tree.needs, { test: true }, 'x is not needed')
 
   t.end()
 })

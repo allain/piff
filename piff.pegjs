@@ -4,7 +4,6 @@
     MemberExpression: "object",
   };
 
-  const filledArray = (count, value) => Array.apply(null, new Array(count)).map(() => value)
   const extractOptional = (optional, index) => optional ? optional[index] : null
   const extractList = (list, index) => list.map(el => el[index])
   const buildList = (head, tail, index) => [head].concat(extractList(tail, index))
@@ -360,8 +359,6 @@ EOS
 EOF
   = !.
 
-// ----- Expressions -----
-
 PrimaryExpression
   = Variable
   / Literal
@@ -403,7 +400,8 @@ PropertySetParameterList
 
 MemberExpression
   = head:(
-        FunctionExpression
+        ClassName
+      / FunctionExpression
       / PrimaryExpression
       / NewToken __ callee:MemberExpression __ args:Arguments {
           return { type: "NewExpression", callee: callee, arguments: args };
@@ -470,8 +468,8 @@ CallExpression
             arguments: args
           }
         }
-      /  callee:MemberExpression __ args:Arguments {
-          return { type: "CallExpression", callee: callee, arguments: args };
+      /  callee:Identifier __ args:Arguments {
+          return { type: "CallExpression", callee, arguments: args };
         }
 
     )
@@ -979,7 +977,7 @@ PropertyDeclaration
     }
 
 ClassDeclaration
-  = ClassToken __ id:Identifier __ "extends" __ ext:Identifier __ "implements" __ imp:Identifier __ "{" __ body:ClassBody __ "}" {
+  = ClassToken __ id:ClassName __ "extends" __ ext:ClassName __ "implements" __ imp:ClassName __ "{" __ body:ClassBody __ "}" {
       return {
         type: "ClassDeclaration",
         id: id,
@@ -988,7 +986,7 @@ ClassDeclaration
         implements: imp
       };
     }
-  / ClassToken __ id:Identifier __ "extends" __ ext:Identifier __ "{" __ body:ClassBody __ "}" {
+  / ClassToken __ id:ClassName __ "extends" __ ext:ClassName __ "{" __ body:ClassBody __ "}" {
       return {
         type: "ClassDeclaration",
         id: id,
@@ -996,7 +994,7 @@ ClassDeclaration
         extends: ext
       };
     }
-  / ClassToken __ id:Identifier __ "{" __ body:ClassBody __ "}" {
+  / ClassToken __ id:ClassName __ "{" __ body:ClassBody __ "}" {
       return {
         type: "ClassDeclaration",
         id: id,
@@ -1004,6 +1002,13 @@ ClassDeclaration
       };
     }
 
+ClassName
+  = head:Lu tail:IdentifierPart* {
+      return {
+        type: "ClassName",
+        name: head + tail.join("")
+      };
+    }
 FunctionExpression
   = FunctionToken __
     "(" __ params:(FormalParameterList __)? ")" __

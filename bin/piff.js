@@ -99,7 +99,7 @@ function run () {
 function watchPatterns (patterns) {
   const watcher = watch(patterns, {
     ignoreInitial: false,
-    delay: 500
+    delay: 50
   })
 
   watcher.on('change', srcFilePath => {
