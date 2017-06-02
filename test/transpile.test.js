@@ -110,6 +110,12 @@ test('class - methods can be declared', t => {
   t.end()
 })
 
+test('class - abstract methods can be declared', t => {
+  let php = transpile('class A { abstract a() }')
+  t.equal(php, 'class A {public abstract function a()}')
+  t.end()
+})
+
 test('class - methods with argument types can be declared', t => {
   let php = transpile('class A { a(B b) {} }')
   t.equal(php, 'class A {public function a(B $b) {}}')

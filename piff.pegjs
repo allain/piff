@@ -947,9 +947,24 @@ FunctionDeclaration
     }
 
 MethodDeclaration
-  = visibility: (
+  = visibility: ( "private" __ /  "protected" __ / "public" __ )?
+    abstract: ( "abstract" __ )?
+    id:Identifier __
+    "(" __ params:(FormalParameterList __)? ")" __
+    !"{"
+    {
+      return {
+        type: "MethodDeclaration",
+        visibility: extractOptional(visibility, 0),
+        abstract: !!abstract,
+        id,
+        params: optionalList(extractOptional(params, 0))
+      };
+    }
+  / visibility: (
       "private" __ /  "protected" __ / "public" __
     )?
+    abstract: ( "abstract" __ )?
     statik: "static"? __
     id:Identifier __
     "(" __ params:(FormalParameterList __)? ")" __
@@ -960,6 +975,7 @@ MethodDeclaration
         type: "MethodDeclaration",
         visibility,
         statik,
+        abstract: !!abstract,
         id,
         body,
         params: optionalList(extractOptional(params, 0))
