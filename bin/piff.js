@@ -27,7 +27,7 @@ if (helping) {
 
 const hasPatterns = argv._.length
 const watching = !!(argv.w || argv.watch)
-const forced = !!(argv.f || argv.forced)
+const forced = !!(argv.f || argv.force)
 
 if (process.stdin.isTTY && !hasPatterns) {
   bail('ERROR: no patterns given\n\n' + USAGE)
@@ -55,22 +55,25 @@ const ts = () => new Date().toISOString().substr(0, 16).replace('T', ' ')
 const fileModified = path =>
   fs.stat(path).then(stats => stats.mtime.getTime(), () => 0)
 
-const updateFile = (srcFilePath, forced) => {
-  const outputFilePath = srcFilePath.replace(/[.]piff$/, '.php')
-  const stats = forced
-    ? Promise.resolve([1, 0])
-    : Promise.all([fileModified(srcFilePath), fileModified(outputFilePath)])
+const needsCompile = forced
+  ? () => Promise.resolve(true)
+  : (srcFilePath, outFilePath) =>
+      Promise.all([fileModified(srcFilePath), fileModified(outFilePath)]).then(
+        ([srcTime, outTime]) => srcTime > outTime
+      )
 
-  return stats.then(([srcTime, outTime]) => {
-    if (srcTime <= outTime) {
+const updateFile = srcFilePath => {
+  const outFilePath = srcFilePath.replace(/[.]piff$/, '.php')
+  return needsCompile(srcFilePath, outFilePath).then(needed => {
+    if (!needed) {
       console.log(ts(), 'skipped', srcFilePath)
       return
     }
 
     return compileFile(srcFilePath)
-      .then(phpCode => fs.writeFile(outputFilePath, phpCode))
+      .then(phpCode => fs.writeFile(outFilePath, phpCode))
       .then(() => {
-        console.log(ts(), 'updated', outputFilePath)
+        console.log(ts(), 'updated', outFilePath)
       })
       .catch(err => {
         console.error(ts(), ' ERROR ', err)
@@ -94,9 +97,7 @@ function run () {
     )
   ).then(
     srcPatterns =>
-      (watching
-        ? watchPatterns(srcPatterns)
-        : compilePatterns(srcPatterns, forced))
+      (watching ? watchPatterns(srcPatterns) : compilePatterns(srcPatterns))
   )
 }
 
@@ -123,13 +124,13 @@ function watchPatterns (patterns) {
   console.log(ts() + ' watching ' + patterns.join(' '))
 }
 
-function compilePatterns (patterns, forced) {
+function compilePatterns (patterns) {
   // Compile all app files in the src directory
   return Promise.all(
     patterns.map(pattern => {
       return new Promise(resolve => {
         glob(pattern, (err, srcFiles) => {
-          Promise.all(srcFiles.map(f => updateFile(f, forced))).then(
+          Promise.all(srcFiles.map(f => updateFile(f))).then(
             () => resolve(srcFiles),
             err => {
               console.error(err)

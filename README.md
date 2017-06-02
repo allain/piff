@@ -88,8 +88,8 @@ console.log(php) // <?php ... echo("hello" . "\n")?>
 # compile ./file.piff to ./file.php
 piff ./file.piff
 
-# compile all piff files in a directory
-piff path/to/dir/
+# compile all piff files in a directory (even if compilation doesn't appear to be needed)
+piff path/to/dir/ --force
 
 # watch a directory and compile any .piff file that needs it
 piff path/to/dir --watch
