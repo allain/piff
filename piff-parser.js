@@ -362,7 +362,7 @@ function peg$parse(input, options) {
       peg$c197 = peg$literalExpectation("]", false),
       peg$c198 = function() { return { type: "ObjectExpression", properties: [] }; },
       peg$c199 = function(properties) {
-             return { type: "ObjectExpression", properties: properties };
+             return { type: "ObjectExpression", properties };
            },
       peg$c200 = ",",
       peg$c201 = peg$literalExpectation(",", false),
@@ -372,14 +372,14 @@ function peg$parse(input, options) {
       peg$c203 = ":",
       peg$c204 = peg$literalExpectation(":", false),
       peg$c205 = function(key, value) {
-            return { type: "Property", key: key, value: value, kind: "init" };
+            return { type: "Property", key, value, kind: "init" };
           },
       peg$c206 = function(value) {
-            return { type: "Property", key: null , value: value, kind: "init" };
+            return { type: "Property", key: null , value, kind: "init" };
           },
       peg$c207 = function(id) { return [id]; },
       peg$c208 = function(callee, args) {
-                return { type: "NewExpression", callee: callee, arguments: args };
+                return { type: "NewExpression", callee, arguments: args };
               },
       peg$c209 = "[]",
       peg$c210 = peg$literalExpectation("[]", false),
@@ -387,7 +387,7 @@ function peg$parse(input, options) {
                 return { array: true, computed: false};
               },
       peg$c212 = function(head, property) {
-                return { property: property, array: true, computed: true };
+                return { property, array: true, computed: true };
               },
       peg$c213 = function(head, property, args) {
                 return { property, method: true, arguments: args, computed: false };
@@ -401,12 +401,12 @@ function peg$parse(input, options) {
                 return { property, method: true, arguments: args, statik: true, computed: false };
               },
       peg$c218 = function(head, property) {
-                return { property: property, statik: true, computed: false };
+                return { property, statik: true, computed: false };
               },
       peg$c219 = "|>",
       peg$c220 = peg$literalExpectation("|>", false),
       peg$c221 = function(head, property) {
-                return { property: property, compose: true, computed: true };
+                return { property, compose: true, computed: true };
               },
       peg$c222 = function(head, tail) {
             return tail.reduce(function(result, element) {
@@ -424,7 +424,7 @@ function peg$parse(input, options) {
             }, head);
           },
       peg$c223 = function(callee) {
-            return { type: "NewExpression", callee: callee, arguments: [] };
+            return { type: "NewExpression", callee, arguments: [] };
           },
       peg$c224 = "@@",
       peg$c225 = peg$literalExpectation("@@", false),
@@ -475,9 +475,9 @@ function peg$parse(input, options) {
       peg$c233 = function(argument, operator) {
             return {
               type: "UpdateExpression",
-              operator: operator,
-              argument: argument,
-              prefix: false
+              prefix: false,
+              operator,
+              argument
             };
           },
       peg$c234 = "++",
@@ -491,8 +491,8 @@ function peg$parse(input, options) {
 
             return {
               type: type,
-              operator: operator,
-              argument: argument,
+              operator,
+              argument,
               prefix: true
             };
           },
@@ -559,25 +559,25 @@ function peg$parse(input, options) {
       peg$c299 = function(test, consequent, alternate) {
             return {
               type: "ConditionalExpression",
-              test: test,
-              consequent: consequent,
-              alternate: alternate
+              test,
+              consequent,
+              alternate
             };
           },
       peg$c300 = function(left, right) {
             return {
               type: "AssignmentExpression",
               operator: "=",
-              left: left,
-              right: right
+              left,
+              right
             };
           },
       peg$c301 = function(left, operator, right) {
             return {
               type: "AssignmentExpression",
-              operator: operator,
-              left: left,
-              right: right
+              operator,
+              left,
+              right
             };
           },
       peg$c302 = "*=",
@@ -621,22 +621,22 @@ function peg$parse(input, options) {
       peg$c331 = function(expression) {
             return {
               type: "ExpressionStatement",
-              expression: expression
+              expression
             };
           },
       peg$c332 = function(test, consequent, alternate) {
             return {
               type: "IfStatement",
-              test: test,
-              consequent: consequent,
-              alternate: alternate
+              test,
+              consequent,
+              alternate
             };
           },
       peg$c333 = function(test, consequent) {
             return {
               type: "IfStatement",
-              test: test,
-              consequent: consequent,
+              test,
+              consequent,
               alternate: null
             };
           },
@@ -667,25 +667,25 @@ function peg$parse(input, options) {
             return { type: "ContinueStatement", label: null };
           },
       peg$c342 = function(label) {
-            return { type: "ContinueStatement", label: label };
+            return { type: "ContinueStatement", label };
           },
       peg$c343 = function() {
             return { type: "BreakStatement", label: null };
           },
       peg$c344 = function(label) {
-            return { type: "BreakStatement", label: label };
+            return { type: "BreakStatement", label };
           },
       peg$c345 = function() {
             return { type: "ReturnStatement", argument: null };
           },
       peg$c346 = function(argument) {
-            return { type: "ReturnStatement", argument: argument };
+            return { type: "ReturnStatement", argument };
           },
       peg$c347 = function(discriminant, cases) {
             return {
               type: "SwitchStatement",
-              discriminant: discriminant,
-              cases: cases
+              discriminant,
+              cases
             };
           },
       peg$c348 = function(clauses) {
@@ -699,7 +699,7 @@ function peg$parse(input, options) {
       peg$c350 = function(test, consequent) {
             return {
               type: "SwitchCase",
-              test: test,
+              test,
               consequent: optionalList(extractOptional(consequent, 1))
             };
           },
@@ -711,33 +711,33 @@ function peg$parse(input, options) {
             };
           },
       peg$c352 = function(label, body) {
-            return { type: "LabeledStatement", label: label, body: body };
+            return { type: "LabeledStatement", label, body };
           },
       peg$c353 = function(argument) {
-            return { type: "ThrowStatement", argument: argument };
+            return { type: "ThrowStatement", argument };
           },
       peg$c354 = function(block, handler, finalizer) {
             return {
               type: "TryStatement",
-              block: block,
-              handler: handler,
-              finalizer: finalizer
+              block,
+              handler,
+              finalizer
             };
           },
       peg$c355 = function(block, handler) {
             return {
               type: "TryStatement",
-              block: block,
-              handler: handler,
+              block,
+              handler,
               finalizer: null
             };
           },
       peg$c356 = function(block, finalizer) {
             return {
               type: "TryStatement",
-              block: block,
+              block,
               handler: null,
-              finalizer: finalizer
+              finalizer
             };
           },
       peg$c357 = function(paramClass, param, body) {
@@ -770,7 +770,7 @@ function peg$parse(input, options) {
             return {
               type: "MethodDeclaration",
               visibility,
-              statik: statik,
+              statik,
               id,
               body,
               params: optionalList(extractOptional(params, 0))
@@ -799,8 +799,8 @@ function peg$parse(input, options) {
       peg$c375 = function(id, ext, imp, body) {
             return {
               type: "ClassDeclaration",
-              id: id,
-              body: body,
+              id,
+              body,
               extends: ext,
               implements: imp
             };
@@ -808,16 +808,16 @@ function peg$parse(input, options) {
       peg$c376 = function(id, ext, body) {
             return {
               type: "ClassDeclaration",
-              id: id,
-              body: body,
+              id,
+              body,
               extends: ext
             };
           },
       peg$c377 = function(id, body) {
             return {
               type: "ClassDeclaration",
-              id: id,
-              body: body,
+              id,
+              body,
             };
           },
       peg$c378 = function(head, tail) {
@@ -830,11 +830,11 @@ function peg$parse(input, options) {
             return {
               type: "FunctionExpression",
               params: optionalList(extractOptional(params, 0)),
-              body: body
+              body
             };
           },
       peg$c380 = function(id, def) {
-            return { type: 'FormalParameter', id, def: def}
+            return { type: 'FormalParameter', id, def}
           },
       peg$c381 = function(id) {
             return { type: 'FormalParameter', id }
