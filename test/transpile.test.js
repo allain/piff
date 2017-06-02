@@ -1,6 +1,7 @@
 const test = require('tape')
 
 const rawTranspile = require('..')
+const { SyntaxError } = require('../piff-parser.js')
 
 // only test the file without white space in it
 const transpile = piff => rawTranspile(piff).replace(/\n\s*/g, '')
@@ -217,10 +218,29 @@ test('strings - concat with strings does not affect parens', t => {
   t.end()
 })
 
-test('compose - supports using pipe operator "=>"', t => {
-  t.equal(transpile('a = 1; a |> b(_)'), '$a = 1;b($a)')
-  t.equal(transpile('a = 1; a |> b(_) |> c(_) |> d(_)'), '$a = 1;d(c(b($a)))')
-  t.equal(transpile('a = 1; a |> b(_, _)'), '$a = 1;b($a, $a)')
+test('compose - supports using pipe operator "|>"', t => {
+  t.equal(transpile('a |> b(_)'), 'b($a)')
+  t.equal(transpile('a |> b(_) |> c(_) |> d(_)'), 'd(c(b($a)))')
+  t.end()
+})
+
+test('compose - fails when no _ placeholder is given to stream into', t => {
+  try {
+    transpile('a |> b')
+    t.fail('should have been a syntax error')
+  } catch (e) {
+    t.ok(e instanceof SyntaxError)
+  }
+  t.end()
+})
+
+test('compose - fails when multiple placeholders is given to stream into', t => {
+  try {
+    transpile('a |> b(_, _)')
+    t.fail('should have been a syntax error')
+  } catch (e) {
+    t.ok(e instanceof SyntaxError)
+  }
   t.end()
 })
 
