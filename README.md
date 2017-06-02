@@ -65,7 +65,7 @@ ticks = []
 tick = fn() { ticks[] = mktime() }
 
 // function composition alternate syntax
-a() => b(_) => c(_) // is the same as: c(b(a()))
+a() |> b(_) |> c(_) // is the same as: c(b(a()))
 ```
 
 ## Installation
