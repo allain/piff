@@ -977,28 +977,14 @@ PropertyDeclaration
     }
 
 ClassDeclaration
-  = ClassToken __ id:ClassName __ "extends" __ ext:ClassName __ "implements" __ imp:ClassName __ "{" __ body:ClassBody __ "}" {
+  = abstract:("abstract" __)? ClassToken __ id:ClassName __ ext:("extends" __ ClassName __)? imp:("implements" __ ClassName __)? "{" __ body:ClassBody __ "}" {
       return {
         type: "ClassDeclaration",
         id,
         body,
-        extends: ext,
-        implements: imp
-      };
-    }
-  / ClassToken __ id:ClassName __ "extends" __ ext:ClassName __ "{" __ body:ClassBody __ "}" {
-      return {
-        type: "ClassDeclaration",
-        id,
-        body,
-        extends: ext
-      };
-    }
-  / ClassToken __ id:ClassName __ "{" __ body:ClassBody __ "}" {
-      return {
-        type: "ClassDeclaration",
-        id,
-        body,
+        abstract: extractOptional(abstract, 0),
+        extends: extractOptional(ext, 2),
+        implements: extractOptional(imp, 2)
       };
     }
 

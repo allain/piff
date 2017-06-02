@@ -91,6 +91,12 @@ test('class - simple works', t => {
   t.end()
 })
 
+test('class - can be declared abstract', t => {
+  let php = transpile('abstract class A {}')
+  t.equal(php, 'abstract class A {}')
+  t.end()
+})
+
 test('class - methods can be declared', t => {
   let php = transpile('class A { a() {} }')
   t.equal(php, 'class A {public function a() {}}')
