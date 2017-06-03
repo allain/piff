@@ -1,6 +1,7 @@
 #!/bin/env node
 /* eslint no-console: [0] */
 
+const Lazy = require('lazy.js')
 const watch = require('glob-watcher')
 const glob = require('glob')
 const fs = require('fs-extra')
@@ -76,8 +77,21 @@ const updateFile = srcFilePath => {
         console.log(ts(), 'updated', outFilePath)
       })
       .catch(err => {
-        console.error(ts(), ' ERROR ', err)
+        complainAboutSyntax(srcFilePath, err)
       })
+  })
+}
+
+const complainAboutSyntax = (srcFilePath, err) => {
+  return fs.readFile(srcFilePath, 'utf-8').then(code => {
+    let lineNumber = err.location.start.line
+    let columnNumber = err.location.start.column
+
+    let line = Lazy(code).split('\n').skip(lineNumber - 1).first()
+    console.error('Syntax Error', srcFilePath, 'line', lineNumber)
+    console.error(line)
+    console.error(Array(columnNumber).join(' ') + '^')
+    console.error()
   })
 }
 

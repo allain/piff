@@ -8,6 +8,14 @@
   const extractList = (list, index) => list.map(el => el[index])
   const buildList = (head, tail, index) => [head].concat(extractList(tail, index))
   const optionalList = (value) => value !== null ? value : []
+  const flatten = (arr, result = []) => arr.reduce((result, item) => {
+    if (Array.isArray(item)) {
+      flatten(item, result)
+    } else {
+      result.push(item)
+    }
+    return result
+  }, result)
 
   function buildBinaryExpression(head, tail) {
     return tail.reduce((result, element) => {
@@ -241,12 +249,12 @@ StringLiteral "string"
     }
 
 DoubleStringCharacter
-  = !('"' / "\\" / LineTerminator) SourceCharacter { return text(); }
+  = !("{" / '"' / "\\" / LineTerminator) SourceCharacter { return text(); }
   / "\\" sequence:EscapeSequence { return sequence; }
   / LineContinuation
 
 SingleStringCharacter
-  = !("'" / "\\" / LineTerminator) SourceCharacter { return text(); }
+  = !("{" / "'" / "\\" / LineTerminator) SourceCharacter { return text(); }
   / "\\" sequence:EscapeSequence { return sequence; }
   / LineContinuation
 
@@ -379,6 +387,7 @@ EOF
 
 PrimaryExpression
   = Variable
+  / StringExpression
   / Literal
   / ArrayLiteral
   / "(" __ expression:Expression __ ")" !"->"{
@@ -394,6 +403,21 @@ ArrayLiteral
   / "[" __ properties:PropertyNameAndValueList __ "," __ "]" {
        return { type: "ObjectExpression", properties };
      }
+
+StringExpression "string expression"
+  = "\"" parts:(StringExpressionEmbed / StringExpressionChars)+ "\"" {
+      return { type: "StringExpression", parts }
+    }
+
+StringExpressionEmbed
+  = "{" expression:Expression "}" {
+    return expression
+  }
+
+StringExpressionChars
+  = chars:DoubleStringCharacter+ {
+    return {type: 'Literal', value: chars.join('')}
+  }
 
 PropertyNameAndValueList
   = head:PropertyAssignment tail:(__ "," __ PropertyAssignment)* {

@@ -237,6 +237,37 @@ test('strings - concat with strings does not affect parens', t => {
   t.end()
 })
 
+test('strings - strings with {expr} embeds get expanded to concats', t => {
+  t.equal(transpile('"{a} {1 + 2}"'), '($a . " " . (1 + 2))')
+  t.equal(transpile('"{a}"'), '($a)')
+  t.equal(transpile('"{++a}"'), '(++$a)')
+  t.equal(
+    transpile('"/tmp/{scrapeName}.json"'),
+    '("/tmp/" . $scrapeName . ".json")'
+  )
+  t.end()
+})
+
+test('strings - strings with {INVALID expression} fails', t => {
+  try {
+    t.equal(transpile('"{test->b}"')) // -> is invalid in piff
+    t.fail('should have failed')
+  } catch (e) {
+    t.ok(e instanceof SyntaxError)
+    t.end()
+  }
+})
+
+test('strings - invalid expressions throw exceptions', t => {
+  try {
+    t.equal(transpile('"{test->b}"')) // -> is invalid in piff
+    t.fail('should have failed')
+  } catch (e) {
+    t.ok(e instanceof SyntaxError)
+    t.end()
+  }
+})
+
 test('compose - supports using pipe operator "|>"', t => {
   t.equal(transpile('a |> b(_)'), 'b($a)')
   t.equal(transpile('a |> b(_) |> c(_) |> d(_)'), 'd(c(b($a)))')
