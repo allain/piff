@@ -242,10 +242,10 @@ HexDigit
 
 StringLiteral "string"
   = '"' chars:DoubleStringCharacter* '"' {
-      return { type: "Literal", value: chars.join("") };
+      return { type: "Literal", quote: '"', value: chars.join("") };
     }
   / "'" chars:SingleStringCharacter* "'" {
-      return { type: "Literal", value: chars.join("") };
+      return { type: "Literal", quote: "'", value: chars.join("") };
     }
 
 DoubleStringCharacter
@@ -254,7 +254,7 @@ DoubleStringCharacter
   / LineContinuation
 
 SingleStringCharacter
-  = !("{" / "'" / "\\" / LineTerminator) SourceCharacter { return text(); }
+  = !("'" / "\\" / LineTerminator) SourceCharacter { return text(); }
   / "\\" sequence:EscapeSequence { return sequence; }
   / LineContinuation
 

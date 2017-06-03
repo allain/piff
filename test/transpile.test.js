@@ -70,13 +70,13 @@ test('functions - used inferences can be deeply nested', t => {
 
 test('arrays - simple array', t => {
   let php = transpile("[1,'2',3]")
-  t.equal(php, '[1, "2", 3]')
+  t.equal(php, "[1, '2', 3]")
   t.end()
 })
 
 test('arrays - key may be naked', t => {
   let php = transpile("[a:1,'b':2]")
-  t.equal(php, '["a" => 1, "b" => 2]')
+  t.equal(php, '["a" => 1, \'b\' => 2]')
   t.end()
 })
 
@@ -275,8 +275,14 @@ test('strings - strings with {INVALID expression} fails', t => {
     t.end()
   }
 })
+
 test('strings - string expression used as single argument to function should not be wrapped with parens', t => {
   t.equal(transpile('a("b{c}d")'), 'a("b" . $c . "d")')
+  t.end()
+})
+
+test('strings - single quote strings are taken literally', t => {
+  t.equal(transpile("'a{b}c'"), "'a{b}c'")
   t.end()
 })
 

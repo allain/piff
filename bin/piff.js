@@ -1,6 +1,8 @@
 #!/bin/env node
 /* eslint no-console: [0] */
 
+const IGNORED_DIRS = /node_modules/
+
 const Lazy = require('lazy.js')
 const watch = require('glob-watcher')
 const glob = require('glob')
@@ -118,7 +120,8 @@ function run () {
 function watchPatterns (patterns) {
   const watcher = watch(patterns, {
     ignoreInitial: false,
-    delay: 50
+    delay: 50,
+    ignored: IGNORED_DIRS
   })
 
   watcher.on('change', srcFilePath => {
