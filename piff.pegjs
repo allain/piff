@@ -1009,14 +1009,10 @@ MethodDeclaration
     }
 
 ClassConstDeclaration
-  = visibility: (
-      "private" __ /  "protected" __ / "public" __
-    )?
-    name:[A-Z_]+ __ "=" __ value:PrimaryExpression EOS {
+  = name:[A-Z_]+ __ "=" __ value:PrimaryExpression EOS {
     return {
       type: 'ClassConstDeclaration',
       name,
-      visibility: extractOptional(visibility, 0) || 'public',
       value
     }
   }
