@@ -256,12 +256,12 @@ test('strings - concat with strings does not affect parens', t => {
 })
 
 test('strings - strings with {expr} embeds get expanded to concats', t => {
-  t.equal(transpile('"{a} {1 + 2}"'), '($a . " " . (1 + 2))')
-  t.equal(transpile('"{a}"'), '($a)')
-  t.equal(transpile('"{++a}"'), '(++$a)')
+  t.equal(transpile('"{a} {1 + 2}"'), '$a . " " . (1 + 2)')
+  t.equal(transpile('"{a}"'), '$a')
+  t.equal(transpile('"{++a}"'), '++$a')
   t.equal(
     transpile('"/tmp/{scrapeName}.json"'),
-    '("/tmp/" . $scrapeName . ".json")'
+    '"/tmp/" . $scrapeName . ".json"'
   )
   t.end()
 })
@@ -274,6 +274,10 @@ test('strings - strings with {INVALID expression} fails', t => {
     t.ok(e instanceof SyntaxError)
     t.end()
   }
+})
+test('strings - string expression used as single argument to function should not be wrapped with parens', t => {
+  t.equal(transpile('a("b{c}d")'), 'a("b" . $c . "d")')
+  t.end()
 })
 
 test('strings - invalid expressions throw exceptions', t => {
