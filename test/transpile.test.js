@@ -373,3 +373,13 @@ test('support standard PHP static access', t => {
   t.equal(transpile('A::B'), 'A::B')
   t.end()
 })
+
+test('switch statement is supported', t => {
+  t.equal(
+    rawTranspile(
+      'switch (a) { case "b": case "c": t(); break; default: s(); break; }'
+    ),
+    'switch ($a) {\n  case "b":\n  case "c":\n  t();\n  break;\n  default:\n  s();\n  break;\n}'
+  )
+  t.end()
+})
