@@ -283,6 +283,7 @@ test('strings - string expression used as single argument to function should not
 
 test('strings - single quote strings are taken literally', t => {
   t.equal(transpile("'a{b}c'"), "'a{b}c'")
+  t.equal(transpile("'\\''"), "'\\''")
   t.end()
 })
 
