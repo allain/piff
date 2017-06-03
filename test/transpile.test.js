@@ -176,6 +176,22 @@ test('class - constants can be declared', t => {
   t.end()
 })
 
+test('class - referencing constants inside a class works', t => {
+  t.equal(
+    transpile('class A { B = 1; t() { a(@@B) }}'),
+    'class A {const B = 1;public function t() {a(self::B);}}'
+  )
+  t.end()
+})
+
+test('class - referencing constants outside a class works', t => {
+  t.equal(
+    transpile('class A { B = 1;};a(A::B)'),
+    'class A {const B = 1;};a(A::B)'
+  )
+  t.end()
+})
+
 test('class - extends is supported', t => {
   let php = transpile('class A { t() {}} class B extends A {}')
   t.equal(php, 'class A {public function t() {}};class B extends A {}')
