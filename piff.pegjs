@@ -406,7 +406,9 @@ ArrayLiteral
 
 StringExpression "string expression"
   = "\"" parts:(StringExpressionEmbed / StringExpressionChars)+ "\"" {
-      return { type: "StringExpression", parts }
+      return (parts.length === 1 && parts[0].type === 'Literal')
+        ? parts[0]
+        : { type: "StringExpression", parts }
     }
 
 StringExpressionEmbed
@@ -1019,18 +1021,17 @@ PropertyDeclaration
   = visibility: (
       "private" __ /  "protected" __ / "public" __
     )?
-    statik: "static"? __
+    statik: ("static" __)?
     id:Variable __
-    "=" __
-    value: PrimaryExpression
+    value:("=" __ PrimaryExpression)?
     EOS
     {
       return {
         type: "PropertyDeclaration",
         id,
-        value,
-        visibility: visibility ? visibility[0] : 'public',
-        statik
+        value: extractOptional(value, 2),
+        visibility: extractOptional(visibility, 0) || 'public',
+        statik: !!statik
       };
     }
 

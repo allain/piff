@@ -134,6 +134,15 @@ test('class - properties can be declared', t => {
   t.end()
 })
 
+test('class - properties can be declared', t => {
+  let php = transpile('class A { w; x=1; private y=2; protected z=3 };')
+  t.equal(
+    php,
+    'class A {public $w;public $x = 1;private $y = 2;protected $z = 3;}'
+  )
+  t.end()
+})
+
 test('class - static properties can be declared', t => {
   let php = transpile(
     'class A { static x=1; private static y=2; protected static x=3 }'
