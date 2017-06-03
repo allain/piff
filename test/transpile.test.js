@@ -165,7 +165,14 @@ test('class - static properties can be declared', t => {
 
 test('class - constants can be declared', t => {
   let php = transpile('class A { B = 10 }')
-  t.equal(php, 'class A {const B = 10;}')
+  t.equal(php, 'class A {public const B = 10;}')
+
+  t.equal(transpile('class A { B_JK = 10 }'), 'class A {public const B_JK = 10;}')
+
+  t.equal(
+    transpile('class A { private B_JK = 10 }'),
+    'class A {private const B_JK = 10;}'
+  )
   t.end()
 })
 
