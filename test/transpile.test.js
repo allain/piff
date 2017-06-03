@@ -135,11 +135,20 @@ test('class - properties can be declared', t => {
 })
 
 test('class - properties can be declared', t => {
-  let php = transpile('class A { w; x=1; private y=2; protected z=3 };')
-  t.equal(
-    php,
-    'class A {public $w;public $x = 1;private $y = 2;protected $z = 3;}'
-  )
+  try {
+    t.equal(
+      transpile('class A { w; x=1; private y=2; protected z=3 };'),
+      'class A {public $w;public $x = 1;private $y = 2;protected $z = 3;}'
+    )
+    t.end()
+  } catch (e) {
+    t.fail(e.location)
+  }
+})
+
+test('class - super short property definitions is supported', t => {
+  t.equal(transpile('class A { w; y }'), 'class A {public $w;public $y;}')
+  t.equal(transpile('class A { w\ny }'), 'class A {public $w;public $y;}')
   t.end()
 })
 

@@ -1022,21 +1022,25 @@ PropertyDeclaration
       "private" __ /  "protected" __ / "public" __
     )?
     statik: ("static" __)?
-    id:Variable __
-    value:("=" __ PrimaryExpression)?
+    id:Variable
+    value:(__ "=" __ PrimaryExpression)?
     EOS
+    !"("
     {
       return {
         type: "PropertyDeclaration",
         id,
-        value: extractOptional(value, 2),
+        value: extractOptional(value, 3),
         visibility: extractOptional(visibility, 0) || 'public',
         statik: !!statik
       };
     }
 
 ClassDeclaration
-  = abstract:("abstract" __)? ClassToken __ id:ClassName __ ext:("extends" __ ClassName __)? imp:("implements" __ ClassName __)? "{" __ body:ClassBody __ "}" {
+  = abstract:("abstract" __)? ClassToken __ id:ClassName __
+    ext:("extends" __ ClassName __)?
+    imp:("implements" __ ClassName __)?
+    "{" __ body:ClassBody __ "}" {
       return {
         type: "ClassDeclaration",
         id,
