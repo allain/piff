@@ -169,10 +169,7 @@ test('class - constants can be declared', t => {
 
   t.equal(transpile('class A { B_JK = 10 }'), 'class A {const B_JK = 10;}')
 
-  t.equal(
-    transpile('class A { B_JK = 10 }'),
-    'class A {const B_JK = 10;}'
-  )
+  t.equal(transpile('class A { B_JK = 10 }'), 'class A {const B_JK = 10;}')
   t.end()
 })
 
@@ -307,6 +304,15 @@ test('strings - string expression used as single argument to function should not
 test('strings - single quote strings are taken literally', t => {
   t.equal(transpile("'a{b}c'"), "'a{b}c'")
   t.equal(transpile("'\\''"), "'\\''")
+  t.end()
+})
+
+test('strings - single quote strings pass escaped strings through', t => {
+  try {
+    t.equal(transpile("t('\\n\\s\\t\\r')"), "t('\\n\\s\\t\\r')")
+  } catch (e) {
+    console.log(e)
+  }
   t.end()
 })
 

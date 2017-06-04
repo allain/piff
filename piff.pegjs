@@ -250,12 +250,12 @@ StringLiteral "string"
 
 DoubleStringCharacter
   = !("{" / '"' / "\\" / LineTerminator) SourceCharacter { return text(); }
-  / "\\" sequence:EscapeSequence { return sequence; }
+  / "\\" sequence:EscapeSequence { return '\\' + sequence; }
   / LineContinuation
 
 SingleStringCharacter
   = !("'" / "\\" / LineTerminator) SourceCharacter { return text(); }
-  / "\\" sequence:EscapeSequence { return sequence; }
+  / "\\" sequence:EscapeSequence { return '\\' + sequence; }
   / LineContinuation
 
 LineContinuation
@@ -275,12 +275,13 @@ SingleEscapeCharacter
   = "'"
   / '"'
   / "\\"
-  / "b"  { return "\b"; }
-  / "f"  { return "\f"; }
-  / "n"  { return "\n"; }
-  / "r"  { return "\r"; }
-  / "t"  { return "\t"; }
-  / "v"  { return "\v"; }
+  / "b"  { return "b"; }
+  / "f"  { return "f"; }
+  / "n"
+  / "r"  { return "r"; }
+  / "t"  { return "t"; }
+  / "s"  { return "s"; }
+  / "v"  { return "v"; }
 
 NonEscapeCharacter
   = !(EscapeCharacter / LineTerminator) SourceCharacter { return text(); }
