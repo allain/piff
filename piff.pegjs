@@ -977,8 +977,8 @@ FunctionDeclaration
 
 InterfaceMethodDeclaration
   = id:Identifier __
-    "(" __ params:(FormalParameterList __)? ")" __
-    !"{"
+    "(" __ params:(FormalParameterList __)? ")"
+    EOS
     {
       return {
         type: "InterfaceMethodDeclaration",
