@@ -1,7 +1,7 @@
 #!/bin/env node
 /* eslint no-console: [0] */
 
-const IGNORED_DIRS = /node_modules/
+const IGNORED_DIRS = /node_modules|.git/
 
 const Lazy = require('lazy.js')
 const watch = require('glob-watcher')

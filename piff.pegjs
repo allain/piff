@@ -168,6 +168,7 @@ Keyword
   / FunctionToken
   / IfToken
   / InstanceofToken
+  / InterfaceToken
   / NewToken
   / ReturnToken
   / SwitchToken
@@ -358,6 +359,7 @@ ForEachToken    = "foreach"    !IdentifierPart
 FunctionToken   = "fn"         !IdentifierPart
 IfToken         = "if"         !IdentifierPart
 InstanceofToken = "instanceof" !IdentifierPart
+InterfaceToken  = "interface" !IdentifierPart
 NewToken        = "new"        !IdentifierPart
 NullToken       = "null"       !IdentifierPart
 ReturnToken     = "return"     !IdentifierPart
@@ -973,6 +975,18 @@ FunctionDeclaration
       };
     }
 
+InterfaceMethodDeclaration
+  = id:Identifier __
+    "(" __ params:(FormalParameterList __)? ")" __
+    !"{"
+    {
+      return {
+        type: "InterfaceMethodDeclaration",
+        id,
+        params: optionalList(extractOptional(params, 0))
+      };
+    }
+
 MethodDeclaration
   = visibility: ( "private" __ /  "protected" __ / "public" __ )?
     abstract: ( "abstract" __ )?
@@ -1052,6 +1066,18 @@ ClassDeclaration
       };
     }
 
+InterfaceDeclaration
+  = InterfaceToken __ id:ClassName __
+    ext:("extends" __ ClassName __)?
+    "{" __ body:InterfaceBody __ "}" {
+      return {
+        type: "InterfaceDeclaration",
+        id,
+        body,
+        extends: extractOptional(ext, 2),
+      };
+    }
+
 ClassName
   = head:Lu tail:IdentifierPart* {
       return {
@@ -1107,6 +1133,14 @@ ClassBody
       };
     }
 
+InterfaceBody
+  = elements:InterfaceElements? {
+      return {
+        type: "InterfaceElements",
+        elements: optionalList(elements)
+      };
+    }
+
 Program
   = body:SourceElements? {
       return {
@@ -1125,6 +1159,15 @@ ClassElement
   / PropertyDeclaration
   / MethodDeclaration
 
+InterfaceElements
+  = head:InterfaceElement tail:(__ InterfaceElement)* {
+      return buildList(head, tail, 1);
+    }
+
+InterfaceElement
+  = ClassConstDeclaration
+  / InterfaceMethodDeclaration
+
 SourceElements
   = head:SourceElement tail:(__ SourceElement)* {
       return buildList(head, tail, 1);
@@ -1132,5 +1175,6 @@ SourceElements
 
 SourceElement
   = Statement
+  / InterfaceDeclaration
   / ClassDeclaration
   / FunctionDeclaration
