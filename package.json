@@ -1,6 +1,6 @@
 {
   "name": "piff",
-  "version": "0.5.6",
+  "version": "0.5.7",
   "main": "index.js",
   "license": "ISC",
   "bin": {
