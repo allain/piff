@@ -21,7 +21,7 @@ If you sound out PHP it kinda sounds like Piff. In the same way that piff kinda 
 
 1. Semicolons are optional
 1. Use clauses are automatically inferred
-1. Functions can be composed using a special syntax
+1. Functions can be composed using a special pipe syntax
 1. Defining classes is less verbose
 1. Defining arrays is less verbose
 1. ...
@@ -58,7 +58,7 @@ class B {
 fn add(a, b) { return a + b }
 
 // Anonymous functions
-mult = fn a(a, b) { return a * b }
+mult = fn (a, b) { return a * b }
 
 // Automatically figures out "use" clause
 ticks = []
