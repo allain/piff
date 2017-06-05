@@ -1056,7 +1056,7 @@ PropertyDeclaration
     }
 
 NamespaceDeclaration
-  = "namespace" __ id:ClassName EOS {
+  = "namespace" __ id:NamespaceName EOS {
     return {
       type: "NamespaceDeclaration",
       id
@@ -1091,17 +1091,31 @@ InterfaceDeclaration
     }
 
 ClassName
-  = head: (Lu (Lu / Ll / "_"/ UnicodeDigit)*) tail:("\\" Lu (Lu / Ll / "_"/ UnicodeDigit)*)* {
+  = namespace:("\\"? (Ll (Ll / UnicodeDigit / "_")* "\\")+) id: (Lu (Lu / Ll / "_"/ UnicodeDigit)*) {
       return {
         type: "ClassName",
-        name: flatten([head, tail]).filter(Boolean).join("")
+        name: flatten([namespace, id]).filter(Boolean).join("")
       };
     }
-  / namespaces:("\\" Lu (Lu / Ll / "_" / UnicodeDigit)*)+ {
+  / id: (Lu (Lu / Ll / "_"/ UnicodeDigit)*) {
       return {
         type: "ClassName",
-        name: flatten(namespaces).filter(Boolean).join("")
+        name: flatten(id).filter(Boolean).join('')
       };
+    }
+
+NamespaceName
+  = ns:("\\" Ll (Ll / UnicodeDigit / "_")*)+ {
+      return {
+        type: 'NamespaceName',
+        name: flatten(ns).join('')
+      }
+    }
+  / ns:((Ll (Ll / UnicodeDigit/ "_")* "\\")* [a-z]+) {
+      return {
+        type: 'NamespaceName',
+        name: flatten(ns).join('')
+      }
     }
 
 FunctionExpression

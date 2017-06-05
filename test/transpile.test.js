@@ -132,8 +132,8 @@ test('class - simple works', t => {
 })
 
 test('class - names can be namespaced', t => {
-  t.equal(transpile('new \\A\\B()'), 'new \\A\\B()')
-  t.equal(transpile('new A\\B()'), 'new A\\B()')
+  //t.equal(transpile('new \\A\\B()'), 'new \\A\\B()')
+  t.equal(transpile('new a\\B()'), 'new a\\B()')
   t.end()
 })
 
@@ -493,6 +493,11 @@ test('class names may contain numbers', t => {
 })
 
 test('namespace can be declared', t => {
-  t.equal(transpile('namespace A'), 'namespace A')
+  t.equal(transpile('namespace a\\b'), 'namespace a\\b')
+  t.end()
+})
+
+test('namespace can be lowercase', t => {
+  t.equal(transpile('namespace a'), 'namespace a')
   t.end()
 })
