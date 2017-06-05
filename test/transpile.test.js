@@ -478,16 +478,11 @@ test('referencing constants is possible on classes', t => {
   t.end()
 })
 
-test.only('function params may be complex expressions', t => {
-  try {
-    t.equal(transpile('fn a(b = A::TEST) {}'), 'function a($b = A::TEST) {}')
-    t.equal(
-      transpile('class A {a(b, c= null, d = APIBuilder::MAX_API_VERSION) {}}'),
-      ''
-    )
-    t.end()
-  } catch (e) {
-    console.log(e)
-    t.fail()
-  }
+test('function params may be complex expressions', t => {
+  t.equal(transpile('fn a(b = A::TEST) {}'), 'function a($b = A::TEST) {}')
+  t.equal(
+    transpile('class A {a(b, c= null, d = APIBuilder::MAX_API_VERSION) {}}'),
+    'class A {public function a($b, $c = null, $d = APIBuilder::MAX_API_VERSION) {}}'
+  )
+  t.end()
 })
