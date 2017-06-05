@@ -506,3 +506,8 @@ test('use clause support', t => {
   t.equal(transpile('use GraphQL\\Type\\Definition\\ObjectType;'), 'use GraphQL\\Type\\Definition\\ObjectType')
   t.end()
 })
+
+test('include is supported', t => {
+  t.equal(transpile('include("a.php")'), 'include("a.php")')
+  t.end();
+});
