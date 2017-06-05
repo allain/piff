@@ -1091,31 +1091,19 @@ InterfaceDeclaration
     }
 
 ClassName
-  = namespace:("\\"? (Ll (Ll / UnicodeDigit / "_")* "\\")+) id: (Lu (Lu / Ll / "_"/ UnicodeDigit)*) {
+  = name: (("\\")? ((Lu / Ll) (Lu / Ll/ UnicodeDigit)* "\\")* Lu (Lu / Ll / UnicodeDigit )*) {
       return {
         type: "ClassName",
-        name: flatten([namespace, id]).filter(Boolean).join("")
-      };
-    }
-  / id: (Lu (Lu / Ll / "_"/ UnicodeDigit)*) {
-      return {
-        type: "ClassName",
-        name: flatten(id).filter(Boolean).join('')
+        name: flatten(name).join('')
       };
     }
 
 NamespaceName
-  = ns:("\\" Ll (Ll / UnicodeDigit / "_")*)+ {
+  = name: (("\\")? ((Lu / Ll) (Lu / Ll/ UnicodeDigit)* "\\")* (Lu / Ll) (Lu / Ll / UnicodeDigit )*) {
       return {
-        type: 'NamespaceName',
-        name: flatten(ns).join('')
-      }
-    }
-  / ns:((Ll (Ll / UnicodeDigit/ "_")* "\\")* [a-z]+) {
-      return {
-        type: 'NamespaceName',
-        name: flatten(ns).join('')
-      }
+        type: "NamespaceName",
+        name: flatten(name).join('')
+      };
     }
 
 FunctionExpression
