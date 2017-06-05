@@ -516,3 +516,8 @@ test('MUTE uses PHP mute', t => {
   t.equal(transpile('MUTE(t())'), '@(t())')
   t.end();
 });
+
+test('parent references expand properly', t => {
+  t.equal(transpile('class A { t() { parent::a() }}'), 'class A {public function t() {parent::a();}}')
+  t.end()
+})
