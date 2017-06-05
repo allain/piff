@@ -154,21 +154,24 @@ function compilePatterns (patterns) {
   // Compile all app files in the src directory
   return Promise.all(
     patterns.map(pattern => {
-      return new Promise(resolve => {
+      return new Promise((resolve, reject) => {
         glob(pattern, (err, srcFiles) => {
-          eachSeries(srcFiles, f =>
-            updateFile(f).then(
-              () => resolve(srcFiles),
-              err => {
-                console.error(err)
-                resolve()
-              }
-            )
-          )
+          if (err) return reject(err)
+
+          resolve(srcFiles)
         })
       })
     })
   )
+    .then(result => flatten(result))
+    .then(srcFiles => {
+      return eachSeries(srcFiles, f =>
+        updateFile(f).catch(err => {
+          console.error(err)
+          resolve()
+        })
+      )
+    })
 }
 
 Promise.resolve().then(run).catch(err => {
