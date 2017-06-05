@@ -501,3 +501,8 @@ test('namespace can be lowercase', t => {
   t.equal(transpile('namespace a'), 'namespace a')
   t.end()
 })
+
+test('use clause support', t => {
+  t.equal(transpile('use GraphQL\\Type\\Definition\\ObjectType;'), 'use GraphQL\\Type\\Definition\\ObjectType')
+  t.end()
+})

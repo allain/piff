@@ -1055,6 +1055,14 @@ PropertyDeclaration
       };
     }
 
+UseDeclaration
+  = "use" __ id:NamespaceName EOS {
+    return {
+      type: "UseDeclaration",
+      id
+    }
+  }
+
 NamespaceDeclaration
   = "namespace" __ id:NamespaceName EOS {
     return {
@@ -1195,6 +1203,7 @@ SourceElements
 
 SourceElement
   = Statement
+  / UseDeclaration
   / NamespaceDeclaration
   / InterfaceDeclaration
   / ClassDeclaration
