@@ -708,7 +708,7 @@ ConditionalExpression
   / LogicalORExpression
 
 AssignmentExpression
-  = left:LeftHandSideExpression __
+  = statik: ("static" __)? left:LeftHandSideExpression __
     "=" !"=" __
     right:AssignmentExpression
     {
@@ -716,10 +716,11 @@ AssignmentExpression
         type: "AssignmentExpression",
         operator: "=",
         left,
-        right
+        right,
+        statik: !!statik
       };
     }
-  / left:LeftHandSideExpression __
+  / statik: ("static" __)? left:LeftHandSideExpression __
     operator:AssignmentOperator __
     right:AssignmentExpression
     {
@@ -727,7 +728,8 @@ AssignmentExpression
         type: "AssignmentExpression",
         operator,
         left,
-        right
+        right,
+        statik: !!statik
       };
     }
   / ConditionalExpression

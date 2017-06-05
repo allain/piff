@@ -4,7 +4,12 @@ const rawTranspile = require('..')
 const { SyntaxError } = require('../piff-parser.js')
 
 // only test the file without white space in it
-const transpile = piff => rawTranspile(piff).replace(/\n\s*/g, '')
+const transpile = piff =>
+  rawTranspile(piff)
+    .replace(/\n\s*/g, '\n')
+    .replace(/;\n+/g, ';')
+    .replace(/\{\n/g, '{')
+    .replace(/\}\n\}/g, '}}')
 
 test('variables - property access does not turn into variables', t => {
   t.equal(transpile('a = null; a.b = 1'), '$a = null;$a->b = 1')
@@ -101,8 +106,11 @@ test('arrays - nesting is possible', t => {
 
 test('interface - simple interface can be declared', t => {
   try {
-    t.equal(transpile('interface I {a()}'), 'interface I {public function a();}')
-  } catch(e) {
+    t.equal(
+      transpile('interface I {a()}'),
+      'interface I {public function a();}'
+    )
+  } catch (e) {
     console.log(e)
   }
 
@@ -447,6 +455,14 @@ test('switch statement is supported', t => {
       'switch (a) { case "b": case "c": t(); break; default: s(); break; }'
     ),
     'switch ($a) {\n  case "b":\n  case "c":\n  t();\n  break;\n  default:\n  s();\n  break;\n}'
+  )
+  t.end()
+})
+
+test('variables - static variables are supported', t => {
+  t.equal(
+    transpile('fn t() { static count=1 }'),
+    'function t() {static $count = 1;}'
   )
   t.end()
 })
