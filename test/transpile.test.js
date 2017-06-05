@@ -511,3 +511,8 @@ test('include is supported', t => {
   t.equal(transpile('include("a.php")'), 'include("a.php")')
   t.end();
 });
+
+test('MUTE uses PHP mute', t => {
+  t.equal(transpile('MUTE(t())'), '@(t())')
+  t.end();
+});
