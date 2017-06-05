@@ -16,6 +16,13 @@ test('variables - arguments may not be anything other than a variable', t => {
   t.end()
 })
 
+test('superglobals - are caught', t => {
+  t.equal(transpile('var_dump(_GET)'), 'var_dump($_GET)')
+  t.equal(transpile('var_dump(_POST)'), 'var_dump($_POST)')
+  t.equal(transpile('var_dump(_REQUEST)'), 'var_dump($_REQUEST)')
+  t.end()
+})
+
 test('constants - are untouched', t => {
   t.equal(transpile('__DIR__'), '__DIR__')
   t.equal(transpile('__FILE__'), '__FILE__')
