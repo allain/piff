@@ -468,10 +468,22 @@ test('variables - static variables are supported', t => {
 })
 
 test('array type on param gets treated properly', t => {
-  t.equal(
-    transpile('fn a(array arr) {}'),
-    'function a(array $arr) {}'
-  )
+  t.equal(transpile('fn a(array arr) {}'), 'function a(array $arr) {}')
 
   t.end()
+})
+
+test('referencing constants is possible on classes', t => {
+  t.equal(transpile('println(A::TEST)'), 'println(A::TEST)')
+  t.end()
+})
+
+test('function params may be complex expressions', t => {
+  try {
+    t.equal(transpile('fn a(b = A::TEST) {}'), 'function a($b = A::TEST) {}')
+    t.end()
+  } catch (e) {
+    console.log(e)
+    t.fail()
+  }
 })

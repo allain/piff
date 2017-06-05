@@ -189,7 +189,7 @@ function peg$parse(input, options) {
         },
       peg$c38 = "_",
       peg$c39 = peg$literalExpectation("_", false),
-      peg$c40 = peg$otherExpectation("identifier"),
+      peg$c40 = peg$otherExpectation("id"),
       peg$c41 = function(head, tail) {
             return {
               type: "Identifier",
@@ -11950,7 +11950,7 @@ function peg$parse(input, options) {
             if (s5 !== peg$FAILED) {
               s6 = peg$parse__();
               if (s6 !== peg$FAILED) {
-                s7 = peg$parsePrimaryExpression();
+                s7 = peg$parseAssignmentExpression();
                 if (s7 !== peg$FAILED) {
                   peg$savedPos = s0;
                   s1 = peg$c400(s1, s3, s7);
@@ -12022,7 +12022,7 @@ function peg$parse(input, options) {
             if (s3 !== peg$FAILED) {
               s4 = peg$parse__();
               if (s4 !== peg$FAILED) {
-                s5 = peg$parsePrimaryExpression();
+                s5 = peg$parseAssignmentExpression();
                 if (s5 !== peg$FAILED) {
                   peg$savedPos = s0;
                   s1 = peg$c402(s1, s5);

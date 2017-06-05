@@ -107,7 +107,7 @@ ConstantPart
   / "_"
 
 
-IdentifierName "identifier"
+IdentifierName "id"
   = head:IdentifierStart tail:IdentifierPart* {
       return {
         type: "Identifier",
@@ -1114,13 +1114,13 @@ FormalParameterList
     }
 
 FormalParameter
-  = kind:Identifier __ id:Variable __ "=" __ def:PrimaryExpression {
+  = kind:Identifier __ id:Variable __ "=" __ def:AssignmentExpression {
       return { type: 'FormalParameter', kind, id, def}
     }
   / kind:Identifier __ id:Variable {
       return { type: 'FormalParameter', kind, id }
     }
-  / id:Variable __ "=" __ def:PrimaryExpression {
+  / id:Variable __ "=" __ def:AssignmentExpression {
       return { type: 'FormalParameter', id, def}
     }
   / id:Variable {
