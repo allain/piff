@@ -466,3 +466,12 @@ test('variables - static variables are supported', t => {
   )
   t.end()
 })
+
+test('array type on param gets treated properly', t => {
+  t.equal(
+    transpile('fn a(array arr) {}'),
+    'function a(array $arr) {}'
+  )
+
+  t.end()
+})
