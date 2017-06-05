@@ -486,3 +486,13 @@ test('function params may be complex expressions', t => {
   )
   t.end()
 })
+
+test('class names may contain numbers', t => {
+  t.equal(transpile('print(S3::A)'), 'print(S3::A)')
+  t.end()
+})
+
+test('namespace can be declared', t => {
+  t.equal(transpile('namespace A'), 'namespace A')
+  t.end()
+})

@@ -1055,6 +1055,14 @@ PropertyDeclaration
       };
     }
 
+NamespaceDeclaration
+  = "namespace" __ id:ClassName EOS {
+    return {
+      type: "NamespaceDeclaration",
+      id
+    }
+  }
+
 ClassDeclaration
   = abstract:("abstract" __)? ClassToken __ id:ClassName __
     ext:("extends" __ ClassName __)?
@@ -1083,13 +1091,13 @@ InterfaceDeclaration
     }
 
 ClassName
-  = head: (Lu (Lu / Ll / "_")*) tail:("\\" Lu (Lu / Ll / "_")*)* {
+  = head: (Lu (Lu / Ll / "_"/ UnicodeDigit)*) tail:("\\" Lu (Lu / Ll / "_"/ UnicodeDigit)*)* {
       return {
         type: "ClassName",
         name: flatten([head, tail]).filter(Boolean).join("")
       };
     }
-  / namespaces:("\\" Lu (Lu / Ll / "_")*)+ {
+  / namespaces:("\\" Lu (Lu / Ll / "_" / UnicodeDigit)*)+ {
       return {
         type: "ClassName",
         name: flatten(namespaces).filter(Boolean).join("")
@@ -1185,6 +1193,7 @@ SourceElements
 
 SourceElement
   = Statement
+  / NamespaceDeclaration
   / InterfaceDeclaration
   / ClassDeclaration
   / FunctionDeclaration
