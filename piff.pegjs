@@ -720,7 +720,7 @@ AssignmentExpression
         statik: !!statik
       };
     }
-  / statik: ("static" __)? left:LeftHandSideExpression __
+  / statik: ("static" __) ? left:LeftHandSideExpression __
     operator:AssignmentOperator __
     right:AssignmentExpression
     {

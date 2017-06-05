@@ -25,7 +25,6 @@ function transpile (piff) {
   ]
 
   visitors.forEach(v => v.visitTree(parseTree))
-
   return format(toPHP(parseTree))
 }
 

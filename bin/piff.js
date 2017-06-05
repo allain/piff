@@ -17,6 +17,12 @@ argv._.splice(0, 2)
 
 const transpile = require('..')
 
+const eachSeries = (arr, f) => {
+  return arr.reduce((last, item) => {
+    return last.then(() => f(item))
+  }, Promise.resolve())
+}
+
 const bail = msg => {
   console.error(msg)
   process.exit(1)
@@ -40,8 +46,9 @@ if (process.stdin.isTTY && !hasPatterns) {
   bail('ERROR: cannot watch stdin\n\n' + USAGE)
 }
 
-const compileFile = path =>
-  fs
+const compileFile = path => {
+  console.log(ts(), 'compiling', path)
+  return fs
     .readFile(path, 'utf-8')
     .then(src => {
       if (!src) throw new Error('src is empty')
@@ -49,6 +56,7 @@ const compileFile = path =>
     })
     .then(transpile)
     .then(php => `<?php\n${php}\n?>`)
+}
 
 const compileStdin = () =>
   getStdin().then(transpile).then(php => `<?php\n${php}?>`)
@@ -67,6 +75,7 @@ const needsCompile = forced
 
 const updateFile = srcFilePath => {
   const outFilePath = srcFilePath.replace(/[.]piff$/, '.php')
+
   return needsCompile(srcFilePath, outFilePath).then(needed => {
     if (!needed) {
       console.log(ts(), 'skipped', srcFilePath)
@@ -147,27 +156,22 @@ function compilePatterns (patterns) {
     patterns.map(pattern => {
       return new Promise(resolve => {
         glob(pattern, (err, srcFiles) => {
-          Promise.all(srcFiles.map(f => updateFile(f))).then(
-            () => resolve(srcFiles),
-            err => {
-              console.error(err)
-              resolve()
-            }
+          eachSeries(srcFiles, f =>
+            updateFile(f).then(
+              () => resolve(srcFiles),
+              err => {
+                console.error(err)
+                resolve()
+              }
+            )
           )
         })
       })
     })
-  ).then(compiles => {
-    console.log(ts() + ' ' + flatten(compiles).length + ' files compiled')
-  })
+  )
 }
 
-Promise.resolve().then(run).then(
-  msg => {
-    if (msg) console.log(msg)
-  },
-  err => {
-    console.error(err.message)
-    process.exit(1)
-  }
-)
+Promise.resolve().then(run).catch(err => {
+  console.error(err.message)
+  process.exit(1)
+})
