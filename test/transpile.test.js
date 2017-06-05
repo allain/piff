@@ -93,7 +93,12 @@ test('arrays - nesting is possible', t => {
 })
 
 test('interface - simple interface can be declared', t => {
-  t.equal(transpile('interface I {a()}'), 'interface I {public function a();}')
+  try {
+    t.equal(transpile('interface I {a()}'), 'interface I {public function a();}')
+  } catch(e) {
+    console.log(e)
+  }
+
   t.end()
 })
 
@@ -108,6 +113,12 @@ test('interface - interface can have constants defined', t => {
 test('class - simple works', t => {
   let php = transpile('class A {}')
   t.equal(php, 'class A {}')
+  t.end()
+})
+
+test('class - names can be namespaced', t => {
+  t.equal(transpile('new \\A\\B()'), 'new \\A\\B()')
+  t.equal(transpile('new A\\B()'), 'new A\\B()')
   t.end()
 })
 
