@@ -521,3 +521,8 @@ test('parent references expand properly', t => {
   t.equal(transpile('class A { t() { parent::a() }}'), 'class A {public function t() {parent::a();}}')
   t.end()
 })
+
+test('array - literals can have expressions as keys', t => {
+  t.equal(transpile('[1 * 2 * 3: 4]'), '[1 * 2 * 3 => 4]')
+  t.end()
+})

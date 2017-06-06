@@ -435,6 +435,15 @@ PropertyAssignment
   = key:PropertyName __ ":" __ value:AssignmentExpression {
       return { type: "Property", key, value, kind: "init" };
     }
+  / key:StringLiteral __ ":" __ value:AssignmentExpression {
+      return { type: "Property", key, value, kind: "init" };
+    }
+  / key:NumericLiteral __ ":" __ value:AssignmentExpression {
+      return { type: "Property", key, value, kind: "init" };
+    }
+  / key:MultiplicativeExpression __ ":" __ value:AssignmentExpression {
+      return { type: "Property", key, value, kind: "init" };
+    }
   / value:AssignmentExpression {
       return { type: "Property", key: null , value, kind: "init" };
     }
