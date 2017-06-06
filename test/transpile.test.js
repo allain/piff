@@ -131,8 +131,13 @@ test('class - simple works', t => {
   t.end()
 })
 
+test('class - name can contain underscore', t => {
+  let php = transpile('class A_B {}')
+  t.equal(php, 'class A_B {}')
+  t.end()
+})
+
 test('class - names can be namespaced', t => {
-  //t.equal(transpile('new \\A\\B()'), 'new \\A\\B()')
   t.equal(transpile('new a\\B()'), 'new a\\B()')
   t.end()
 })
@@ -503,22 +508,28 @@ test('namespace can be lowercase', t => {
 })
 
 test('use clause support', t => {
-  t.equal(transpile('use GraphQL\\Type\\Definition\\ObjectType;'), 'use GraphQL\\Type\\Definition\\ObjectType')
+  t.equal(
+    transpile('use GraphQL\\Type\\Definition\\ObjectType;'),
+    'use GraphQL\\Type\\Definition\\ObjectType'
+  )
   t.end()
 })
 
 test('include is supported', t => {
   t.equal(transpile('include("a.php")'), 'include("a.php")')
-  t.end();
-});
+  t.end()
+})
 
 test('MUTE uses PHP mute', t => {
   t.equal(transpile('MUTE(t())'), '@(t())')
-  t.end();
-});
+  t.end()
+})
 
 test('parent references expand properly', t => {
-  t.equal(transpile('class A { t() { parent::a() }}'), 'class A {public function t() {parent::a();}}')
+  t.equal(
+    transpile('class A { t() { parent::a() }}'),
+    'class A {public function t() {parent::a();}}'
+  )
   t.end()
 })
 

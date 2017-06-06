@@ -1108,7 +1108,7 @@ InterfaceDeclaration
     }
 
 ClassName
-  = name: (("\\")? ((Lu / Ll) (Lu / Ll/ UnicodeDigit)* "\\")* Lu (Lu / Ll / UnicodeDigit )*) {
+  = name: (("\\")? ((Lu / Ll) (Lu / Ll/ UnicodeDigit/ "_")* "\\")* Lu (Lu / Ll / UnicodeDigit / "_")*) {
       return {
         type: "ClassName",
         name: flatten(name).join('')
