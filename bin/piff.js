@@ -163,7 +163,7 @@ function compilePatterns (patterns) {
       })
     })
   )
-    .then(result => flatten(result))
+    .then(result => Lazy(result).flatten().toArray())
     .then(srcFiles => {
       return eachSeries(srcFiles, f =>
         updateFile(f).catch(err => {

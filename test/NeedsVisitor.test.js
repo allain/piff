@@ -1,4 +1,3 @@
-const test = require('tape')
 const { parse } = require('../piff-parser.js')
 const Visitor = require('../lib/Visitor.js')
 
@@ -12,60 +11,56 @@ const postLogger = new Visitor({
   }
 })
 
-test('NeedsVisitor - works for empty code', t => {
+test('NeedsVisitor - works for empty code', () => {
   let v = new NV()
 
   let tree = parse('')
 
   v.visitTree(tree)
 
-  t.deepEqual(tree.needs, [], 'sets needs on Program')
-
-  t.end()
+  expect(tree.needs).toEqual({})
 })
 
-test('NeedsVisitor - treats function calls to undefined vars as undefined needed', t => {
-  let v = new NV()
+test(
+  'NeedsVisitor - treats function calls to undefined vars as undefined needed',
+  () => {
+    let v = new NV()
 
-  let tree = parse('print("Hello")')
+    let tree = parse('print("Hello")')
 
-  v.visitTree(tree)
+    v.visitTree(tree)
 
-  t.deepEqual(tree.needs, {}, 'sets need for global function call')
+    expect(tree.needs).toEqual({})
+  }
+)
 
-  t.end()
-})
-
-test('NeedsVisitor - assignments are recorded as needs being met', t => {
+test('NeedsVisitor - assignments are recorded as needs being met', () => {
   let v = new NV()
 
   let tree = parse('x = 10')
 
   v.visitTree(tree)
 
-  t.deepEqual(tree.needs, { x: true }, 'sets need x to be met')
-
-  t.end()
+  expect(tree.needs).toEqual({ x: true })
 })
 
-test('NeedsVisitor - function arguments satisfy needs', t => {
+test('NeedsVisitor - function arguments satisfy needs', () => {
   let v = new NV()
 
   let tree = parse('fn test(x) { print (x)}')
 
   v.visitTree(tree)
 
-  t.deepEqual(tree.needs, {}, 'x is not needed')
-
-  t.end()
+  expect(tree.needs).toEqual({})
 })
 
-test('NeedsVisitor - function arguments on anonymous function satisfy needs', t => {
-  let v = new NV()
+test(
+  'NeedsVisitor - function arguments on anonymous function satisfy needs',
+  () => {
+    let v = new NV()
 
-  let tree = parse('test = fn(x){ print (x) }')
-  v.visitTree(tree)
-  t.deepEqual(tree.needs, { test: true }, 'x is not needed')
-
-  t.end()
-})
+    let tree = parse('test = fn(x){ print (x) }')
+    v.visitTree(tree)
+    expect(tree.needs).toEqual({ test: true })
+  }
+)

@@ -1,4 +1,3 @@
-const test = require('tape')
 const { parse } = require('../piff-parser.js')
 const Visitor = require('../lib/Visitor.js')
 
@@ -13,7 +12,7 @@ const postLogger = new Visitor({
   }
 })
 
-test('ScopeVisitor - works for empty code', t => {
+test('ScopeVisitor - works for empty code', () => {
   let nv = new NV()
   let v = new SV()
 
@@ -22,12 +21,10 @@ test('ScopeVisitor - works for empty code', t => {
   nv.visitTree(tree)
   v.visitTree(tree)
 
-  t.deepEqual(tree.scope, [], 'sets scope to empty on Program')
-
-  t.end()
+  expect(tree.scope).toEqual([])
 })
 
-test('ScopeVisitor - works for function', t => {
+test('ScopeVisitor - works for function', () => {
   let nv = new NV()
   let v = new SV()
 
@@ -36,30 +33,23 @@ test('ScopeVisitor - works for function', t => {
   nv.visitTree(tree)
   v.visitTree(tree)
 
-  t.deepEqual(tree.scope, [], 'defines test in the program scope')
-
-  t.end()
+  expect(tree.scope).toEqual([])
 })
 
-test('ScopeVisitor - sets uses property on anonymous functions', t => {
+test('ScopeVisitor - sets uses property on anonymous functions', (done) => {
   let nv = new NV()
   let v = new SV()
 
-  let tree
-  try {
-    tree = parse(`x = 10; test= fn(){z=20\nprint(x)} `)
-  } catch (e) {
-    t.fail(e)
-    return
-  }
+  let tree = parse(`x = 10; test= fn(){z=20\nprint(x)} `)
 
   nv.visitTree(tree)
   v.visitTree(tree)
+  
   new Visitor({
     post: {
       FunctionExpression: n => {
-        t.deepEqual(n.used, ['x'])
-        t.end()
+        expect(n.used).toEqual(['x'])
+        done()
       }
     }
   }).visitTree(tree)
