@@ -15,6 +15,7 @@ class Person {
     return @first + ' ' + @last
   }
 }
+
 person = new Person('Popo', 'Jijo')
 
 println(person.fullName())

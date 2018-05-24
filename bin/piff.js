@@ -8,6 +8,7 @@ const watch = require('glob-watcher')
 const glob = require('glob')
 const fs = require('fs-extra')
 const flatten = require('flatten')
+
 const USAGE = fs.readFileSync(__dirname + '/usage.txt', 'utf-8')
 const getStdin = require('get-stdin')
 const argv = require('minimist')(process.argv, {

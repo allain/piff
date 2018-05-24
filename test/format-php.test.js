@@ -1,4 +1,4 @@
-const format = require('../lib/format.js')
+const format = require('../lib/format-php.js')
 
 test('format - semicolons', () => {
   expect(format([';', ';', ';'])).toBe('')

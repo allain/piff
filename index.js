@@ -1,6 +1,6 @@
 const { parse } = require('./piff-parser.js')
 
-const format = require('./lib/format.js')
+const formatPHP = require('./lib/format-php.js')
 const toPHP = require('./lib/to-php.js')
 
 const PropertyLiteralVisitor = require('./lib/visitors/PropertyLiteralVisitor.js')
@@ -25,7 +25,7 @@ function transpile (piff) {
   ]
 
   visitors.forEach(v => v.visitTree(parseTree))
-  return format(toPHP(parseTree))
+  return formatPHP(toPHP(parseTree))
 }
 
 module.exports = transpile

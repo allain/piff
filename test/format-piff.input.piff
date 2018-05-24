@@ -1,0 +1,19 @@
+fn a(b,c) { print("a"); print("b")}
+
+fn x() {
+
+    
+    print()
+    print()
+    print()
+
+    print()
+    print()
+
+
+}
+
+
+
+x=1+2*3+(4/2)
+
