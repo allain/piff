@@ -6,4 +6,4 @@
 fn a() {
 }
 
-print() // comment at end of line 
+print()

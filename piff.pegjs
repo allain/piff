@@ -42,8 +42,7 @@
 }
 
 Start
-  = prelim:__ program:Program postfix:__ { 
-    program.body = [prelim].concat(program.body).concat(postfix).filter(Boolean)
+  = program:Program { 
     return program; 
   }
 
@@ -81,8 +80,10 @@ Comment "comment"
 
 MultiLineComment
   = "/*" comment:(!"*/" SourceCharacter)* "*/" {
-    return '/*' + flatten(comment, []).join('') + '*/'
-
+    return {
+      type: 'MultiLineComment',
+      comment: '/*' + flatten(comment, []).join('') + '*/'
+    }
   }
 
 MultiLineCommentNoLineTerminator
@@ -91,8 +92,11 @@ MultiLineCommentNoLineTerminator
   }
 
 SingleLineComment
-  = "//" comment:(!LineTerminator SourceCharacter)* {
-    return "// " + flatten(comment, []).join('').trim()
+  = "//" comment:(!LineTerminator SourceCharacter)* LineTerminatorSequence {
+    return {
+      type: 'SingleLineComment',
+      comment: "// " + flatten(comment, []).join('').trim()
+    }
   }
 
 Identifier
@@ -389,24 +393,16 @@ WhileToken      = "while"      !IdentifierPart
 
 // Skipped
 __
-  = whitespace:(WhiteSpace / LineTerminatorSequence / Comment)* {
-    if (!whitespace.length) return null
-    return {
-      type: 'WhiteSpace',
-      value: whitespace.join('')
-    }
-  }
+  = (WhiteSpace / LineTerminatorSequence)* 
 
 _
-  = (WhiteSpace / MultiLineCommentNoLineTerminator)* {
-
-  }
+  = (WhiteSpace / MultiLineCommentNoLineTerminator)* 
 
 // Automatic Semicolon Insertion
 
 EOS
   = __ ";"
-  / _ SingleLineComment? LineTerminatorSequence
+  / _ /*SingleLineComment? */ LineTerminatorSequence 
   / _ &"}"
   / __ EOF
 
@@ -790,6 +786,7 @@ Expression
 
 Statement
   = Block
+  / Comment
   / EmptyStatement
   / ExpressionStatement
   / IfStatement
@@ -820,7 +817,7 @@ Initialiser
   = "=" !"=" __ expression:AssignmentExpression { return expression; }
 
 EmptyStatement
-  = ";" { return { type: "EmptyStatement" }; }
+  = WhiteSpace* LineTerminatorSequence { return { type: "EmptyStatement" }; }
 
 ExpressionStatement
   = !("{" / FunctionToken) expression:Expression EOS {
@@ -960,7 +957,7 @@ ThrowStatement
     }
 
 TryStatement
-  = TryToken __ block:Block __ handler:Catch __ finalizer:Finally {
+  = TryToken __ block:Block __ handler:Catch __ finalizer:Finally EOS {
       return {
         type: "TryStatement",
         block,
@@ -968,7 +965,7 @@ TryStatement
         finalizer
       };
     }
-  / TryToken __ block:Block __ handler:Catch {
+  / TryToken __ block:Block __ handler:Catch EOS {
       return {
         type: "TryStatement",
         block,
@@ -976,7 +973,7 @@ TryStatement
         finalizer: null
       };
     }
-  / TryToken __ block:Block __ finalizer:Finally {
+  / TryToken __ block:Block __ finalizer:Finally EOS {
       return {
         type: "TryStatement",
         block,
@@ -986,7 +983,7 @@ TryStatement
     }
 
 Catch
-  = CatchToken __ "(" __ paramClass:Identifier __ param:Variable __ ")" __ body:Block {
+  = CatchToken __ "(" __ paramClass:Identifier __ param:Variable __ ")" __ body:Block EOS {
       return {
         type: "CatchClause",
         param,
@@ -1003,7 +1000,7 @@ Finally
 FunctionDeclaration
   = FunctionToken __ id:Identifier __
     "(" __ params:(FormalParameterList __)? ")" __
-    "{" __ body:FunctionBody __ "}"
+    "{" __ body:FunctionBody __ "}" EOS
     {
       return {
         type: "FunctionDeclaration",
@@ -1212,9 +1209,9 @@ Program
     }
 
 SourceElements
-  = head:SourceElement tail:(__ SourceElement)* {
-    return flatten(tail, [head])
-      //return buildList(head, tail, 1);
+  = head:SourceElement tail:(WhiteSpace* SourceElement)* {
+    //return flatten(tail, [head])
+      return buildList(head, tail, 1);
     }
 
 SourceElement
