@@ -8,6 +8,7 @@
   const extractList = (list, index) => list.map(el => el[index])
   const buildList = (head, tail, index) => [head].concat(extractList(tail, index))
   const optionalList = (value) => value !== null ? value : []
+
   const flatten = (arr, result = []) => arr.reduce((result, item) => {
     if (Array.isArray(item)) {
       flatten(item, result)
@@ -41,7 +42,10 @@
 }
 
 Start
-  = __ program:Program __ { return program; }
+  = prelim:__ program:Program postfix:__ { 
+    program.body = [prelim].concat(program.body).concat(postfix).filter(Boolean)
+    return program; 
+  }
 
 // ----- Lexical Grammar -----
 
@@ -58,7 +62,11 @@ WhiteSpace "whitespace"
   / Zs
 
 LineTerminator
-  = [\n\r\u2028\u2029]
+  = [\n\r\u2028\u2029] {
+    return {
+      type: "LineTerminator"
+    }
+  }
 
 LineTerminatorSequence "end of line"
   = "\n"
@@ -69,16 +77,23 @@ LineTerminatorSequence "end of line"
 
 Comment "comment"
   = MultiLineComment
-  / SingleLineComment
+  / SingleLineComment 
 
 MultiLineComment
-  = "/*" (!"*/" SourceCharacter)* "*/"
+  = "/*" comment:(!"*/" SourceCharacter)* "*/" {
+    return '/*' + flatten(comment, []).join('') + '*/'
+
+  }
 
 MultiLineCommentNoLineTerminator
-  = "/*" (!("*/" / LineTerminator) SourceCharacter)* "*/"
+  = "/*" comment:(!("*/" / LineTerminator) SourceCharacter)* "*/" {
+    return '/*' + flatten(comment, []).join('').trim() + '*/'
+  }
 
 SingleLineComment
-  = "//" (!LineTerminator SourceCharacter)*
+  = "//" comment:(!LineTerminator SourceCharacter)* {
+    return "// " + flatten(comment, []).join('').trim()
+  }
 
 Identifier
   = !ReservedWord name:IdentifierName { return name; }
@@ -374,10 +389,18 @@ WhileToken      = "while"      !IdentifierPart
 
 // Skipped
 __
-  = (WhiteSpace / LineTerminatorSequence / Comment)*
+  = whitespace:(WhiteSpace / LineTerminatorSequence / Comment)* {
+    if (!whitespace.length) return null
+    return {
+      type: 'WhiteSpace',
+      value: whitespace.join('')
+    }
+  }
 
 _
-  = (WhiteSpace / MultiLineCommentNoLineTerminator)*
+  = (WhiteSpace / MultiLineCommentNoLineTerminator)* {
+
+  }
 
 // Automatic Semicolon Insertion
 
@@ -788,7 +811,9 @@ Block
     }
 
 StatementList
-  = head:Statement tail:(__ Statement)* { return buildList(head, tail, 1); }
+  = head:Statement tail:(__ Statement)* { 
+    return buildList(head, tail, 1); 
+  }
 
 
 Initialiser
@@ -1186,6 +1211,20 @@ Program
       };
     }
 
+SourceElements
+  = head:SourceElement tail:(__ SourceElement)* {
+    return flatten(tail, [head])
+      //return buildList(head, tail, 1);
+    }
+
+SourceElement
+  = Statement
+  / UseDeclaration
+  / NamespaceDeclaration
+  / InterfaceDeclaration
+  / ClassDeclaration
+  / FunctionDeclaration
+
 ClassElements
   = head:ClassElement tail:(__ ClassElement)* {
       return buildList(head, tail, 1);
@@ -1204,16 +1243,3 @@ InterfaceElements
 InterfaceElement
   = ClassConstDeclaration
   / InterfaceMethodDeclaration
-
-SourceElements
-  = head:SourceElement tail:(__ SourceElement)* {
-      return buildList(head, tail, 1);
-    }
-
-SourceElement
-  = Statement
-  / UseDeclaration
-  / NamespaceDeclaration
-  / InterfaceDeclaration
-  / ClassDeclaration
-  / FunctionDeclaration

@@ -9,7 +9,7 @@ const transpile = piff =>
     .replace(/\{\n/g, '{')
     .replace(/\}\n\}/g, '}}')
 
-test('variables - property access does not turn into variables', () => {
+test.only('variables - property access does not turn into variables', () => {
   expect(transpile('a = null; a.b = 1')).toBe('$a = null;$a->b = 1')
 })
 
