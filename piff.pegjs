@@ -61,11 +61,7 @@ WhiteSpace "whitespace"
   / Zs
 
 LineTerminator
-  = [\n\r\u2028\u2029] {
-    return {
-      type: "LineTerminator"
-    }
-  }
+  = [\n\r\u2028\u2029]
 
 LineTerminatorSequence "end of line"
   = "\n"
@@ -1068,7 +1064,8 @@ ClassConstDeclaration
   }
 
 PropertyDeclaration
-  = visibility: (
+  = WhiteSpace* 
+    visibility: (
       "private" __ /  "protected" __ / "public" __
     )?
     statik: ("static" __)?
@@ -1106,7 +1103,7 @@ ClassDeclaration
   = abstract:("abstract" __)? ClassToken __ id:ClassName __
     ext:("extends" __ ClassName __)?
     imp:("implements" __ ClassName __)?
-    "{" __ body:ClassBody __ "}" {
+    "{" __ body:ClassBody __ "}" EOS {
       return {
         type: "ClassDeclaration",
         id,
@@ -1223,7 +1220,7 @@ SourceElement
   / FunctionDeclaration
 
 ClassElements
-  = head:ClassElement tail:(__ ClassElement)* {
+  = head:ClassElement tail:(WhiteSpace* ClassElement)* {
       return buildList(head, tail, 1);
     }
 

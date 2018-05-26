@@ -9,7 +9,7 @@ const transpile = piff =>
     .replace(/\{\n/g, '{')
     .replace(/\}\n\}/g, '}}')
 
-test.only('variables - property access does not turn into variables', () => {
+test('variables - property access does not turn into variables', () => {
   expect(transpile('a = null; a.b = 1')).toBe('$a = null;$a->b = 1')
 })
 
@@ -135,12 +135,6 @@ test('class - static methods can be declared', () => {
 
 test('class - properties can be declared', () => {
   expect(
-    transpile('class A { x=1; private y=2; protected x=3 };')
-  ).toBe('class A {public $x = 1;private $y = 2;protected $x = 3;}')
-})
-
-test('class - properties can be declared', () => {
-  expect(
     transpile('class A { w; x=1; private y=2; protected z=3 };')
   ).toBe('class A {public $w;public $x = 1;private $y = 2;protected $z = 3;}')
 })
@@ -178,19 +172,19 @@ test('class - referencing constants outside a class works', () => {
 
 test('class - extends is supported', () => {
   expect(
-    transpile('class A { t() {}} class B extends A {}')
+    transpile('class A { t() {}}; class B extends A {}')
   ).toBe('class A {public function t() {}};class B extends A {}')
 })
 
 test('class - calling override can be done using parent in method', () => {
   expect(
-    transpile('class A { t() {}} class B extends A { t() { parent() }}')
+    transpile('class A { t() {}}; class B extends A { t() { parent() }}')
   ).toBe('class A {public function t() {}};class B extends A {public function t() {parent::t();}}')
 })
 
 test('class - calling override can be done using parent in constructor', () => {
   expect(
-    transpile('class A { } class B extends A { B() { parent() }}')
+    transpile('class A { }; class B extends A { B() { parent() }}')
   ).toBe('class A {};class B extends A {public function B() {parent::__construct();}}')
 })
 
