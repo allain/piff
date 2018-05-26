@@ -3,6 +3,7 @@ class A {}
 class B extends A {}
 
 class Person {
+  C_TEST = 100
   firstName
   lastName
 

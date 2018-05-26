@@ -1058,7 +1058,7 @@ ClassConstDeclaration
   = name:[A-Z_]+ __ "=" __ value:PrimaryExpression EOS {
     return {
       type: 'ClassConstDeclaration',
-      name,
+      name: name.join(''),
       value
     }
   }

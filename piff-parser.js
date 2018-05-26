@@ -853,7 +853,7 @@ function peg$parse(input, options) {
       peg$c395 = function(name, value) {
           return {
             type: 'ClassConstDeclaration',
-            name,
+            name: name.join(''),
             value
           }
         },
