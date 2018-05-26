@@ -35,6 +35,15 @@ test('functions - simple named function', () => {
   ).toBe('function add($a, $b) {return $a + $b;}')
 })
 
+test('functions - single statement bodies supported', () => {
+  expect(
+    transpile('fn add(a, b) a + b')
+  ).toBe('function add($a, $b) {return $a + $b;}')
+  expect(
+    transpile('fn add(a, b) a + b')
+  ).toBe('function add($a, $b) {return $a + $b;}')
+})
+
 test('functions - named function with default param value', () => {
   expect(transpile('fn x(a=1) {}')).toBe('function x($a = 1) {}')
 })

@@ -1,5 +1,6 @@
-class A {
+namespace test\a\b
 
+class A {
 
 }
 
@@ -14,5 +15,9 @@ class Person {
         return firstName 
         + " " 
         + lastName
+    }
+
+    private test() {
+      return 10
     }
 }

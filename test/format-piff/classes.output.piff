@@ -1,3 +1,5 @@
+namespace test\a\b
+
 class A {}
 
 class B extends A {}
@@ -9,5 +11,9 @@ class Person {
 
   fullName() {
     return firstName + " " + lastName
+  }
+
+  private test() {
+    return 10
   }
 }

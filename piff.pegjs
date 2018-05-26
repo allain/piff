@@ -1005,6 +1005,17 @@ FunctionDeclaration
         id
       };
     }
+  / FunctionToken __ id:Identifier __
+    "(" __ params:(FormalParameterList __)? ")" __
+    body:ExpressionStatement EOS
+    {
+      return {
+        type: "FunctionDeclaration",
+        params: optionalList(extractOptional(params, 0)),
+        body,
+        id
+      };
+    }
 
 InterfaceMethodDeclaration
   = id:Identifier __
@@ -1153,6 +1164,16 @@ FunctionExpression
         body
       };
     }
+  / FunctionToken __
+    "(" __ params:(FormalParameterList __)? ")" __
+    body:ExpressionStatement
+    {
+      return {
+        type: "FunctionExpression",
+        params: optionalList(extractOptional(params, 0)),
+        body
+      };
+    }
 
 FormalParameterList
   = head:FormalParameter tail:(__ "," __ FormalParameter)* {
@@ -1207,7 +1228,6 @@ Program
 
 SourceElements
   = head:SourceElement tail:(WhiteSpace* SourceElement)* {
-    //return flatten(tail, [head])
       return buildList(head, tail, 1);
     }
 

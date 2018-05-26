@@ -1,0 +1,7 @@
+// Single line function
+dbl = fn(x) x * 2
+
+
+fn dbl(x) {
+    return x * 2
+}
