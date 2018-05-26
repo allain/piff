@@ -4,6 +4,12 @@
 
 // Here
 fn a() {
+    // Comments in functions are allowed
+  print('yo')
 }
 
-print()
+/* Multi
+  Line
+    Comments
+      Keep
+        WhiteSpace */

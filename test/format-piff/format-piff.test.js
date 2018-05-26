@@ -8,8 +8,15 @@ describe('format-piff', () => {
   const inputs = files.filter(f => f.match(/[.]input[.]piff$/))
   inputs.forEach(input =>
     test(input.replace(/[.]input[.]piff$/, ''), () => {
-      const before = fs.readFileSync(path.resolve(__dirname, input), 'utf-8')
+      const inPath = path.resolve(__dirname, input)
+      const outPath = inPath.replace(/[.]input[.]/g, '.output.')
+
+      const before = fs.readFileSync(inPath, 'utf-8')
       const after = format(before)
+
+      if (!fs.existsSync(outPath)) {
+        fs.writeFileSync(outPath, after, 'utf-8')
+      }
 
       const expectedAfter = fs.readFileSync(
         path.resolve(__dirname, input.replace(/[.]input[.]/g, '.output.')),

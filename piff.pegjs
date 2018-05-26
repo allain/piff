@@ -398,7 +398,7 @@ _
 
 EOS
   = __ ";"
-  / _ /*SingleLineComment? */ LineTerminatorSequence 
+  / _ LineTerminatorSequence 
   / _ &"}"
   / __ EOF
 

@@ -1,0 +1,11 @@
+class A {
+
+
+}
+
+class B extends A {}
+
+class Person {
+    firstName
+    lastName
+}
