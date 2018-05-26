@@ -1226,6 +1226,7 @@ ClassElements
 
 ClassElement
   = ClassConstDeclaration
+  / EmptyStatement
   / PropertyDeclaration
   / MethodDeclaration
 

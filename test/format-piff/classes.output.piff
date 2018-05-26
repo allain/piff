@@ -5,4 +5,8 @@ class B extends A {}
 class Person {
   firstName
   lastName
+
+  fullName() {
+    return firstName + " " + lastName
+  }
 }

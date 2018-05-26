@@ -12649,9 +12649,12 @@ function peg$parse(input, options) {
 
     s0 = peg$parseClassConstDeclaration();
     if (s0 === peg$FAILED) {
-      s0 = peg$parsePropertyDeclaration();
+      s0 = peg$parseEmptyStatement();
       if (s0 === peg$FAILED) {
-        s0 = peg$parseMethodDeclaration();
+        s0 = peg$parsePropertyDeclaration();
+        if (s0 === peg$FAILED) {
+          s0 = peg$parseMethodDeclaration();
+        }
       }
     }
 
