@@ -1,4 +1,4 @@
-const {format} = require('..')
+const { format } = require('..')
 
 const fs = require('fs-extra')
 const path = require('path')
@@ -254,7 +254,7 @@ describe('format-piff', () => {
 
   it('leaves strings untoucched', () =>
     expect(format('"   if(x){jklh}"')).toEqual('"   if(x){jklh}"\n'))
-  
+
   it('does not double escape strings', () =>
     expect(format('p("\\n\\\\\\t")')).toEqual('p("\\n\\\\\\t")\n'))
 })
