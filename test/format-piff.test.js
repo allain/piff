@@ -257,4 +257,6 @@ describe('format-piff', () => {
 
   it('does not double escape strings', () =>
     expect(format('p("\\n\\\\\\t")')).toEqual('p("\\n\\\\\\t")\n'))
+
+  it('property access', () => expect(format('a . b . c')).toEqual('a.b.c\n'))
 })
