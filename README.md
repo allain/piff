@@ -79,8 +79,11 @@ npm install -g piff
 ### Progammatic usage
 ```js
 const piff = require('piff')
-let php = piff("fn add(a, b) { return a + b }\n echo(add(1,2))")
+let php = piff.transpile("fn add(a, b) { return a + b }\n echo(add(1,2))")
 console.log(php) // <?php echo("hello" . "\n")?>
+
+console.log(piff.format("fn add(a,b){return a+b}")
+// outputs a nicely formatted version of the piff code
 ```
 
 ### Command line usage
