@@ -9,6 +9,7 @@
   "scripts": {
     "build": "pegjs -o piff-parser.js piff.pegjs",
     "test": "npm run build && jest --runInBand",
+    "test:noisy": "pegjs -o piff-parser.js --trace piff.pegjs && jest --runInBand",
     "test:coverage": "npm run build && jest --runInBand --coverage"
   },
   "dependencies": {

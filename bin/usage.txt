@@ -5,3 +5,4 @@ Compiles piff into PHP
 options:
   -w, --watch               watches the sources and recompiles when needed
   -f, --force               forces compilation to happen even if it doesn't appear to be needed
+  --format                  formats piff files in place

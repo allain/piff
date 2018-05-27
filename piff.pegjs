@@ -83,28 +83,28 @@ MultiLineComment
   }
 
 MultiLineCommentNoLineTerminator
-  = "/*" comment:(!("*/" / LineTerminator) SourceCharacter)* "*/" {
+  = "/*" comment:(!("*/" / LineTerminator / EOF) SourceCharacter)* "*/" {
     return '/*' + flatten(comment, []).join('').trim() + '*/'
   }
 
 SingleLineComment
-  = "//" comment:(!LineTerminator SourceCharacter)* LineTerminatorSequence {
+  = "//" comment:(!LineTerminator SourceCharacter)* (LineTerminatorSequence / EOF) {
     return {
       type: 'SingleLineComment',
       comment: "// " + flatten(comment, []).join('').trim()
     }
   }
 
-Identifier
+Identifier "id"
   = !ReservedWord name:IdentifierName { return name; }
 
-Variable
+Variable "var"
   = !ReservedWord name:IdentifierName {
     name.type = "Variable";
     return name
   }
 
-Constant
+Constant "const"
   = !ReservedWord head:ConstantStart tail:ConstantPart+ {
     return {
       type: "Identifier",
@@ -432,7 +432,7 @@ StringExpression "string expression"
     }
 
 StringExpressionEmbed
-  = "{" expression:Expression "}" {
+  = "{" __ expression:Expression __ "}" {
     return expression
   }
 
@@ -780,7 +780,7 @@ Expression
 
 // ----- A.4 Statements -----
 
-Statement
+Statement 
   = Block
   / Comment
   / EmptyStatement
@@ -790,12 +790,11 @@ Statement
   / ContinueStatement
   / BreakStatement
   / ReturnStatement
-  / LabelledStatement
   / SwitchStatement
   / ThrowStatement
   / TryStatement
 
-Block
+Block "block"
   = "{" __ body:(StatementList __)? "}" {
       return {
         type: "BlockStatement",
@@ -823,7 +822,7 @@ ExpressionStatement
       };
     }
 
-IfStatement
+IfStatement "if"
   = IfToken __ "(" __ test:Expression __ ")" __
     consequent:Statement __
     ElseToken __
@@ -874,18 +873,18 @@ IterationStatement
 
 ContinueStatement
   = ContinueToken EOS {
-      return { type: "ContinueStatement", label: null };
+      return { type: "ContinueStatement", levels: null };
     }
-  / ContinueToken _ label:Identifier EOS {
-      return { type: "ContinueStatement", label };
+  / ContinueToken _ levels:DecimalIntegerLiteral EOS {
+      return { type: "ContinueStatement", levels};
     }
 
 BreakStatement
   = BreakToken EOS {
-      return { type: "BreakStatement", label: null };
+      return { type: "BreakStatement", levels: null };
     }
-  / BreakToken _ label:Identifier EOS {
-      return { type: "BreakStatement", label };
+  / BreakToken _ levels:DecimalIntegerLiteral EOS {
+      return { type: "BreakStatement", levels };
     }
 
 ReturnStatement
@@ -942,30 +941,25 @@ DefaultClause
       };
     }
 
-LabelledStatement
-  = label:Identifier __ ":" __ body:Statement {
-      return { type: "LabeledStatement", label, body };
-    }
-
 ThrowStatement
   = ThrowToken _ argument:Expression EOS {
       return { type: "ThrowStatement", argument };
     }
 
-TryStatement
-  = TryToken __ block:Block __ handler:Catch __ finalizer:Finally EOS {
+TryStatement "try" 
+  = TryToken __ block:Block handlers:(__ Catch)+ __ finalizer:Finally EOS {
       return {
         type: "TryStatement",
         block,
-        handler,
+        handlers: handlers.map(h => h[1]),
         finalizer
       };
     }
-  / TryToken __ block:Block __ handler:Catch EOS {
+  / TryToken __ block:Block handlers:(__ Catch)+ EOS {
       return {
         type: "TryStatement",
         block,
-        handler,
+        handlers: handlers.map(h => h[1]),
         finalizer: null
       };
     }
@@ -973,13 +967,13 @@ TryStatement
       return {
         type: "TryStatement",
         block,
-        handler: null,
+        handlers: [],
         finalizer
       };
     }
 
-Catch
-  = CatchToken __ "(" __ paramClass:Identifier __ param:Variable __ ")" __ body:Block EOS {
+Catch "catch"
+  = CatchToken __ "(" __ paramClass:Identifier __ param:Variable __ ")" __ body:Block {
       return {
         type: "CatchClause",
         param,
@@ -988,12 +982,12 @@ Catch
       };
     }
 
-Finally
+Finally "finally"
   = FinallyToken __ block:Block { return block; }
 
 // ----- A.5 Functions and Programs -----
 
-FunctionDeclaration
+FunctionDeclaration "function declaration"
   = FunctionToken __ id:Identifier __
     "(" __ params:(FormalParameterList __)? ")" __
     "{" __ body:FunctionBody __ "}" EOS
@@ -1094,7 +1088,7 @@ PropertyDeclaration
       };
     }
 
-UseDeclaration
+UseDeclaration "use declaration"
   = "use" __ id:NamespaceName EOS {
     return {
       type: "UseDeclaration",
@@ -1102,7 +1096,7 @@ UseDeclaration
     }
   }
 
-NamespaceDeclaration
+NamespaceDeclaration "namespace declaration"
   = "namespace" __ id:NamespaceName EOS {
     return {
       type: "NamespaceDeclaration",
@@ -1110,7 +1104,7 @@ NamespaceDeclaration
     }
   }
 
-ClassDeclaration
+ClassDeclaration "class declaration"
   = abstract:("abstract" __)? ClassToken __ id:ClassName __
     ext:("extends" __ ClassName __)?
     imp:("implements" __ ClassName __)?
@@ -1125,7 +1119,7 @@ ClassDeclaration
       };
     }
 
-InterfaceDeclaration
+InterfaceDeclaration "interface declaration"
   = InterfaceToken __ id:ClassName __
     ext:("extends" __ ClassName __)?
     "{" __ body:InterfaceBody __ "}" {
@@ -1232,7 +1226,8 @@ SourceElements
     }
 
 SourceElement
-  = Statement
+  = Comment 
+  / Statement
   / UseDeclaration
   / NamespaceDeclaration
   / InterfaceDeclaration

@@ -15,16 +15,16 @@ I'm aware that there are tools for compiling JavaScript to PHP, but I didn't wan
 
 ## Why the idiotic name?
 
-If you sound out PHP it kinda sounds like Piff. In the same way that piff kinda feels like PHP.
+If you sound out PHP, it kinda sounds like Piff. In the same way that piff kinda feels like PHP.
 
-## Features
+## Features / Opinions
 
 1. Semicolons are optional
 1. Use clauses are automatically inferred
-1. Functions can be composed using a special pipe syntax
+1. Functions can be composed using a special pipe syntax 
 1. Defining classes is less verbose
 1. Defining arrays is less verbose
-1. ...
+1. Formatting shoudl be part of the language (like in go) 
 
 ## A Quick Piff example that demonstrates some of its benefits
 
@@ -57,8 +57,8 @@ class B {
 // named functions
 fn add(a, b) { return a + b }
 
-// Anonymous functions
-mult = fn (a, b) { return a * b }
+// Anonymous functions (with expression as block)
+mult = fn (a, b) a * b
 
 // Automatically figures out "use" clause
 ticks = []
@@ -79,8 +79,8 @@ npm install -g piff
 ### Progammatic usage
 ```js
 const piff = require('piff')
-let php = piff("'hello' => echo(_ + '\n')")
-console.log(php) // <?php ... echo("hello" . "\n")?>
+let php = piff("fn add(a, b) { return a + b }\n echo(add(1,2))")
+console.log(php) // <?php echo("hello" . "\n")?>
 ```
 
 ### Command line usage

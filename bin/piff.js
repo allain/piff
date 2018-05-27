@@ -1,4 +1,4 @@
-#!/bin/env node
+#!/usr/bin/env node
 /* eslint no-console: [0] */
 
 const IGNORED_DIRS = /node_modules|.git/
@@ -12,11 +12,12 @@ const flatten = require('flatten')
 const USAGE = fs.readFileSync(__dirname + '/usage.txt', 'utf-8')
 const getStdin = require('get-stdin')
 const argv = require('minimist')(process.argv, {
-  boolean: ['w', 'watch', 'f', 'force']
+  boolean: ['w', 'watch', 'f', 'force', 'format']
 })
 argv._.splice(0, 2)
 
 const transpile = require('..')
+const format = require('../lib/format-piff')
 
 const eachSeries = (arr, f) => {
   return arr.reduce((last, item) => {
@@ -37,6 +38,7 @@ if (helping) {
 
 const hasPatterns = argv._.length
 const watching = !!(argv.w || argv.watch)
+const formatting = !!argv.format
 const forced = !!(argv.f || argv.force)
 
 if (process.stdin.isTTY && !hasPatterns) {
@@ -45,6 +47,8 @@ if (process.stdin.isTTY && !hasPatterns) {
   bail('ERROR: patterns given when reading from stdin\n\n' + USAGE)
 } else if (!process.stdin.isTTY && watching) {
   bail('ERROR: cannot watch stdin\n\n' + USAGE)
+} else if (watching && formatting) {
+  bail('ERROR: cannot watch and format at the same time\n\n' + USAGE)
 }
 
 const compileFile = path => {
@@ -94,6 +98,22 @@ const updateFile = srcFilePath => {
   })
 }
 
+const formatFile = path => {
+  console.log(ts(), 'formatting', path)
+  return fs
+    .readFile(path, 'utf-8')
+    .then(src => {
+      if (!src) throw new Error('src is empty')
+      return src
+    })
+    .then(src => format(src))
+    .then(formatted =>
+      fs.writeFile(path, formatted, 'utf-8').catch(err => {
+        console.error('ERROR: unable to save formatted piff')
+      })
+    )
+}
+
 const complainAboutSyntax = (srcFilePath, err) => {
   return fs.readFile(srcFilePath, 'utf-8').then(code => {
     let lineNumber = err.location.start.line
@@ -121,10 +141,17 @@ function run () {
               : pattern)
         )
     )
-  ).then(
-    srcPatterns =>
-      (watching ? watchPatterns(srcPatterns) : compilePatterns(srcPatterns))
-  )
+  ).then(srcPatterns => {
+    if (watching) {
+      return watchPatterns(srcPatterns)
+    }
+
+    if (formatting) {
+      return formatPatterns(srcPatterns)
+    }
+
+    return compilePatterns(srcPatterns)
+  })
 }
 
 function watchPatterns (patterns) {
@@ -174,6 +201,31 @@ function compilePatterns (patterns) {
       )
     })
 }
+
+function formatPatterns(patterns) {
+  // Compile all app files in the src directory
+  return Promise.all(
+    patterns.map(pattern => {
+      return new Promise((resolve, reject) => {
+        glob(pattern, (err, srcFiles) => {
+          if (err) return reject(err)
+
+          resolve(srcFiles)
+        })
+      })
+    })
+  )
+    .then(result => Lazy(result).flatten().toArray())
+    .then(srcFiles => {
+      return eachSeries(srcFiles, f =>
+        formatFile(f).catch(err => {
+          console.error(err)
+          resolve()
+        })
+      )
+    })
+}
+
 
 Promise.resolve().then(run).catch(err => {
   console.error(err.message)

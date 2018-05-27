@@ -1,16 +1,15 @@
-fn println (msg) {
+fn println(msg) {
   print(msg + "\n")
 }
-
 a = [1, 2, 3]
-a = [1, '2', 3, 4]
+a = [1, "2", 3, 4]
 
 // keys will be treated as strings
-a = [a: 1, "b": 2, 'c': 3]
+a = [a: 1, b: 2, c: 3]
 
 // nesting is supported
 a = [a: 1, b: 2, c: [3, 4, 5]]
-println(a['c'][2]) // outputs 5
+println(a["c"][2])
 
-a = [b: [c: [d: 'e']]]
+a = [b: [c: [d: "e"]]]
 var_dump(a)

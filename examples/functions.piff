@@ -1,19 +1,16 @@
 // simple function
-fn add(a, b) {
-  return a + b
-}
+fn add(a, b) a + b
 
 fn div(n, d=1) {
   return n / d
 }
 
 // anonymous function
-multiply = fn(a, b) {
-  return a * b
-}
+multiply = fn(a, b) a * b
 
 // anonymous function using external variables
 ticks = []
 tick = fn() {
+  // Woohoo!, no need to declare ticks as being used by this closure
   ticks[] = mktime()
 }
