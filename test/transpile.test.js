@@ -1,4 +1,4 @@
-const rawTranspile = require('..')
+const rawTranspile = require('..').transpile
 const { SyntaxError } = require('../piff-parser.js')
 
 // only test the file without white space in it
@@ -412,4 +412,4 @@ test('keywords are allowed as properties', () => {
 })
 
 test('comment - single line comment works', () =>
-  expect(translapile('// a')).toBe('// a'))
+  expect(transpile('// a')).toBe('// a'))

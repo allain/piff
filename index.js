@@ -1,7 +1,8 @@
-const { parse } = require('./piff-parser.js')
+const { parse } = require('./piff-parser')
 
-const formatPHP = require('./lib/format-php.js')
-const toPHP = require('./lib/to-php.js')
+const formatPHP = require('./lib/format-php')
+const toPHP = require('./lib/to-php')
+const format = require('./lib/format-piff')
 
 const PropertyLiteralVisitor = require('./lib/visitors/PropertyLiteralVisitor.js')
 const ParentCallVisitor = require('./lib/visitors/ParentCallVisitor.js')
@@ -28,4 +29,7 @@ function transpile (piff) {
   return formatPHP(toPHP(parseTree))
 }
 
-module.exports = transpile
+module.exports = {
+  transpile,
+  format
+}

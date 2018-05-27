@@ -1,4 +1,5 @@
-const format = require('../../lib/format-piff.js')
+const {format} = require('..')
+
 const fs = require('fs-extra')
 const path = require('path')
 
