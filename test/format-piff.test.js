@@ -1,4 +1,7 @@
 const { format } = require('..')
+const { parse } = require('../piff-parser')
+
+const treeType = require('./tree-type-helper')
 
 const fs = require('fs-extra')
 const path = require('path')
@@ -19,6 +22,26 @@ describe('format-piff', () => {
   describe('classes', () => {
     it('makes empty classes on a sinle line', () =>
       expect(format('class A{\n\n\n}')).toEqual('class A {}\n'))
+
+    it('formats method correctly', () => {
+      expect(format('class A { a() {print()}}')).toEqual(
+        'class A {\n  a() {\n    print()\n  }\n}\n'
+      )
+    })
+
+    it('leaves empty line above class definition', () => {
+      const formatted = format('class A {}\nclass B {}')
+      expect(treeType(parse(formatted))).toEqual([
+        'Program',
+        '  ClassDeclaration',
+        '    ClassName',
+        '    ClassElements',
+        '  EmptyStatement',
+        '  ClassDeclaration',
+        '    ClassName',
+        '    ClassElements'
+      ])
+    })
 
     it('leaves appropriate space', () =>
       expect(
