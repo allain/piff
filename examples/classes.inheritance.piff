@@ -1,10 +1,10 @@
 fn println(msg) {
-  print(msg + '\n')
+  print(msg + "\n")
 }
 
 class Person {
-  first = ''
-  last = ''
+  first = ""
+  last = ""
 
   Person(first, last) {
     @first = first
@@ -12,12 +12,12 @@ class Person {
   }
 
   fullName() {
-    return @first + ' ' + @last
+    return @first + " " + @last
   }
 }
 
 class Adult extends Person {
-  title = ''
+  title = ""
 
   Adult(title, first, name) {
     parent(first, name)
@@ -25,9 +25,9 @@ class Adult extends Person {
   }
 
   fullName() {
-    return @title + ' ' + parent()
+    return @title + " " + parent()
   }
 }
 
-adult = new Adult('Mr', 'Popo', 'Jijo')
-println(adult.fullName())
+adult = new Adult("Mr", "Popo", "Jijo")
+println(adult.fullName)

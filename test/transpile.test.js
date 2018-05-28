@@ -413,3 +413,6 @@ test('keywords are allowed as properties', () => {
 
 test('comment - single line comment works', () =>
   expect(transpile('// a')).toBe('// a'))
+
+test('comment - multi-line comment works', () =>
+  expect(rawTranspile('/* a\n  b\n   c*/')).toBe('/* a\n  b\n   c*/'))

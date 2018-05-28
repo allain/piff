@@ -1,10 +1,10 @@
 fn println(msg) {
-  print(msg + '\n')
+  print(msg + "\n")
 }
 
 class Person {
-  first = ''
-  last = ''
+  first = ""
+  last = ""
 
   Person(first, last) {
     @first = first
@@ -12,12 +12,12 @@ class Person {
   }
 
   fullName() {
-    return @first + ' ' + @last
+    return @first + " " + @last
   }
 }
 
-person = new Person('Popo', 'Jijo')
+person = new Person("Popo", "Jijo")
 
-println(person.fullName())
+println(person.fullName)
 
 // private static call is blocked Person::t()
