@@ -24,9 +24,10 @@ If you sound out PHP, it kinda sounds like Piff. In the same way that piff kinda
 1. Functions can be composed using a special pipe syntax 
 1. Defining classes is less verbose
 1. Defining arrays is less verbose
-1. Formatting shoudl be part of the language (like in go) 
+1. Formatting should be part of the language (like in go) 
+1. ...
 
-## A Quick Piff example that demonstrates some of its benefits
+## A Quick Piff Example
 
 ```c
 // Calling Overriden methods with parent
@@ -76,7 +77,10 @@ npm install -g piff
 
 ## Usage
 
-### Progammatic usage
+Command line usage is available using [piff-cli](https://github.com/allain/piff-cli)
+
+Programmatic usage can be performed like so:
+
 ```js
 const piff = require('piff')
 let php = piff.transpile("fn add(a, b) { return a + b }\n echo(add(1,2))")
@@ -86,20 +90,4 @@ console.log(piff.format("fn add(a,b){return a+b}")
 // outputs a nicely formatted version of the piff code
 ```
 
-### Command line usage
-```bash
-# compile ./file.piff to ./file.php
-piff ./file.piff
-
-# compile all piff files in a directory (even if compilation doesn't appear to be needed)
-piff path/to/dir/ --force
-
-# watch a directory and compile any .piff file that needs it
-piff path/to/dir --watch
-
-# or with shorter params
-piff path/to/dir -w
-
-# Plays nice with stdin/out too
-echo "print('hello')" | piff | php
-```
+## Command line usage
