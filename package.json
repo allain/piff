@@ -3,9 +3,6 @@
   "version": "0.8.0",
   "main": "index.js",
   "license": "ISC",
-  "bin": {
-    "piff": "./bin/piff.js"
-  },
   "scripts": {
     "build": "pegjs -o piff-parser.js piff.pegjs",
     "test": "npm run build && jest --runInBand",
