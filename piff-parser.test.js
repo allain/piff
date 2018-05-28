@@ -1,14 +1,14 @@
 const Visitor = require('./lib/Visitor')
 const parser = require('./piff-parser.js')
 
-const typeTree = require('./test/tree-type-helper')
+const typeTree = require('./lib/tree-type-helper')
 
 describe('parser', () => {
   it('recognizes EmptyStatements', () =>
     expect(typeTree(parser.parse('\n\n'))).toEqual([
       'Program',
       '  EmptyStatement',
-      '  EmptyStatement',
+      '  EmptyStatement'
     ]))
 
   it('recognizes EmptyStatements between classes', () =>
