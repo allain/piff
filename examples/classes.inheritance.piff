@@ -1,5 +1,5 @@
 fn println(msg) {
-  print(msg + "\n")
+  print("{msg}\n")
 }
 
 class Person {
