@@ -42,9 +42,7 @@
 }
 
 Start
-  = program:Program { 
-    return program; 
-  }
+  = __ program:Program __ { return program; }
 
 // ----- Lexical Grammar -----
 
@@ -72,15 +70,16 @@ LineTerminatorSequence "end of line"
 
 Comment "comment"
   = MultiLineComment
-  / SingleLineComment 
+  / SingleLineComment
 
 MultiLineComment
-  = "/*" comment:(!"*/" SourceCharacter)* "*/" {
+ = "/*" comment:(!"*/" SourceCharacter)* "*/" {
     return {
       type: 'MultiLineComment',
       comment: '/*' + flatten(comment, []).join('') + '*/'
     }
   }
+
 
 MultiLineCommentNoLineTerminator
   = "/*" comment:(!("*/" / LineTerminator / EOF) SourceCharacter)* "*/" {
@@ -389,16 +388,16 @@ WhileToken      = "while"      !IdentifierPart
 
 // Skipped
 __
-  = (WhiteSpace / LineTerminatorSequence)* 
+  = (WhiteSpace / LineTerminatorSequence )*
 
 _
-  = (WhiteSpace / MultiLineCommentNoLineTerminator)* 
+  = (WhiteSpace / MultiLineCommentNoLineTerminator)*
 
 // Automatic Semicolon Insertion
 
 EOS
   = __ ";"
-  / _ LineTerminatorSequence 
+  / _ LineTerminatorSequence
   / _ &"}"
   / __ EOF
 
@@ -780,7 +779,7 @@ Expression
 
 // ----- A.4 Statements -----
 
-Statement 
+Statement
   = Block
   / Comment
   / EmptyStatement
@@ -803,7 +802,7 @@ Block "block"
     }
 
 StatementList
-  = head:Statement tail:(__ Statement)* { 
+  = head:Statement tail:(__ Statement)* {
     return buildList(head, tail, 1); 
   }
 
@@ -946,7 +945,7 @@ ThrowStatement
       return { type: "ThrowStatement", argument };
     }
 
-TryStatement "try" 
+TryStatement "try"
   = TryToken __ block:Block handlers:(__ Catch)+ __ finalizer:Finally EOS {
       return {
         type: "TryStatement",
@@ -1060,10 +1059,10 @@ MethodDeclaration
     }
 
 ClassConstDeclaration
-  = name:[A-Z_]+ __ "=" __ value:PrimaryExpression EOS {
+  = name:$[A-Z_]+ __ "=" __ value:PrimaryExpression EOS {
     return {
       type: 'ClassConstDeclaration',
-      name: name.join(''),
+      name,
       value
     }
   }
@@ -1119,7 +1118,7 @@ ClassDeclaration "class declaration"
       };
     }
 
-InterfaceDeclaration "interface declaration"
+InterfaceDeclaration "interface declaration" 
   = InterfaceToken __ id:ClassName __
     ext:("extends" __ ClassName __)?
     "{" __ body:InterfaceBody __ "}" {
@@ -1158,7 +1157,7 @@ FunctionExpression
         body
       };
     }
-  / FunctionToken __
+      / FunctionToken __
     "(" __ params:(FormalParameterList __)? ")" __
     body:ExpressionStatement
     {
