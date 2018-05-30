@@ -73,24 +73,24 @@ Comment "comment"
   / SingleLineComment
 
 MultiLineComment
- = "/*" comment:(!"*/" SourceCharacter)* "*/" {
+ = "/*" comment:$(!"*/" SourceCharacter)* "*/" {
     return {
       type: 'MultiLineComment',
-      comment: '/*' + flatten(comment, []).join('') + '*/'
+      comment: '/*' + comment + '*/'
     }
   }
 
 
 MultiLineCommentNoLineTerminator
-  = "/*" comment:(!("*/" / LineTerminator / EOF) SourceCharacter)* "*/" {
-    return '/*' + flatten(comment, []).join('').trim() + '*/'
+  = "/*" comment:$(!("*/" / LineTerminator / EOF) SourceCharacter)* "*/" {
+    return '/*' + comment.trim() + '*/'
   }
 
 SingleLineComment
-  = "//" comment:(!LineTerminator SourceCharacter)* (LineTerminatorSequence / EOF) {
+  = "//" comment:$(!LineTerminator SourceCharacter)* (LineTerminatorSequence / EOF) {
     return {
       type: 'SingleLineComment',
-      comment: "// " + flatten(comment, []).join('').trim()
+      comment: "// " + comment.trim()
     }
   }
 
@@ -104,10 +104,10 @@ Variable "var"
   }
 
 Constant "const"
-  = !ReservedWord head:ConstantStart tail:ConstantPart+ {
+  = !ReservedWord head:ConstantStart tail:$ConstantPart+ {
     return {
       type: "Identifier",
-      name: head + tail.join("")
+      name: head + tail
     };
   }
 
@@ -122,10 +122,10 @@ ConstantPart
 
 
 IdentifierName "id"
-  = head:IdentifierStart tail:IdentifierPart* {
+  = head:IdentifierStart tail:$IdentifierPart* {
       return {
         type: "Identifier",
-        name: head + tail.join("")
+        name: head + tail
       };
     }
 
@@ -256,11 +256,11 @@ HexDigit
   = [0-9a-f]i
 
 StringLiteral "string"
-  = '"' chars:DoubleStringCharacter* '"' {
-      return { type: "Literal", quote: '"', value: chars.join("") };
+  = '"' chars:$DoubleStringCharacter* '"' {
+      return { type: "Literal", quote: '"', value: chars };
     }
-  / "'" chars:SingleStringCharacter* "'" {
-      return { type: "Literal", quote: "'", value: chars.join("") };
+  / "'" chars:$SingleStringCharacter* "'" {
+      return { type: "Literal", quote: "'", value: chars };
     }
 
 DoubleStringCharacter
@@ -419,9 +419,6 @@ ArrayLiteral
   / "[" __ properties:PropertyNameAndValueList __ "]" {
        return { type: "ObjectExpression", properties };
      }
-  / "[" __ properties:PropertyNameAndValueList __ "," __ "]" {
-       return { type: "ObjectExpression", properties };
-     }
 
 StringExpression "string expression"
   = "\"" parts:(StringExpressionEmbed / StringExpressionChars)+ "\"" {
@@ -436,8 +433,8 @@ StringExpressionEmbed
   }
 
 StringExpressionChars
-  = chars:DoubleStringCharacter+ {
-    return {type: 'Literal', value: chars.join('')}
+  = chars:$DoubleStringCharacter+ {
+    return {type: 'Literal', value: chars }
   }
 
 PropertyNameAndValueList
@@ -1131,18 +1128,18 @@ InterfaceDeclaration "interface declaration"
     }
 
 ClassName
-  = name: (("\\")? ((Lu / Ll) (Lu / Ll/ UnicodeDigit/ "_")* "\\")* Lu (Lu / Ll / UnicodeDigit / "_")*) {
+  = name: $(("\\")? ((Lu / Ll) (Lu / Ll/ UnicodeDigit/ "_")* "\\")* Lu (Lu / Ll / UnicodeDigit / "_")*) {
       return {
         type: "ClassName",
-        name: flatten(name).join('')
+        name: name 
       };
     }
 
 NamespaceName
-  = name: (("\\")? ((Lu / Ll) (Lu / Ll/ UnicodeDigit)* "\\")* (Lu / Ll) (Lu / Ll / UnicodeDigit )*) {
+  = name: $(("\\")? ((Lu / Ll) (Lu / Ll/ UnicodeDigit)* "\\")* (Lu / Ll) (Lu / Ll / UnicodeDigit )*) {
       return {
         type: "NamespaceName",
-        name: flatten(name).join('')
+        name: name
       };
     }
 

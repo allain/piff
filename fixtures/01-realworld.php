@@ -1,75 +1,60 @@
-use GraphQL\Type\Definition\ObjectType
-
-use GraphQL\Type\Definition\ListOfType
-
-use GraphQL\Type\Definition\Type
-
-fn queryAll(
-  type,
-  untranslatedFields,
-  translatedFields,
-  condition,
-  languages
-) {
-  fields = []
-  foreach (untranslatedFields as f) {
-    fields[] = "tbl_{type}.{f}"
-  }
-
-  foreach (translatedFields as tf) {
-    foreach (languages as lang) {
-      fields[] = "{lang}.{tf} AS {lang}_{tf}"
-    }
-  }
-
-  sql = "SELECT " + implode(",", fields)
-  sql = "" + sql + " FROM tbl_{type}"
-  if (translatedFields) {
-    foreach (languages as lang) {
-      sql = "" + sql + " LEFT JOIN tbl_{type}Translation AS {lang} ON {lang}.id = tbl_{type}.id AND {lang}.language = '{lang}'"
-    }
-  }
-
-  if (condition) {
-    sql = "" + sql + " WHERE " + condition
-  }
-
-  command = Yii.app().db.createCommand(sql)
-  rows = command.queryAll()
-  result = []
-
-  foreach (rows as row) {
-    r = []
-    foreach (untranslatedFields as f) {
-      r[f] = idx(row, f)
-    }
-    foreach (translatedFields as f) {
-      r[f] = null
-      foreach (languages as lang) {
-        val = idx(row, lang + "_" + f)
-        if (val !== null) {
-          r[f] = val
-          break
-        }
-      }
-    }
-    result[] = r
-  }
-
-  return result
-}
-
+<?php
+use GraphQL\Type\Definition\ObjectType;
+ use GraphQL\Type\Definition\ListOfType;
+ use GraphQL\Type\Definition\Type;
+function queryAll($type, $untranslatedFields, $translatedFields, $condition, $languages) {
+  $fields = [];
+  foreach ($untranslatedFields as $f) {
+    $fields[] = "tbl_" . $type . "." . $f;
+  };
+  foreach ($translatedFields as $tf) {
+    foreach ($languages as $lang) {
+      $fields[] = $lang . "." . $tf . " AS " . $lang . "_" . $tf;
+    };
+  };
+  $sql = "SELECT " . implode(",", $fields);
+  $sql = "" . $sql . " FROM tbl_" . $type;
+  if ($translatedFields) {
+    foreach ($languages as $lang) {
+      $sql = "" . $sql . " LEFT JOIN tbl_" . $type . "Translation AS " . $lang . " ON " . $lang . ".id = tbl_" . $type . ".id AND " . $lang . ".language = '" . $lang . "'";
+    };
+  };
+  if ($condition) {
+    $sql = "" . $sql . " WHERE " . $condition;
+  };
+  $command = Yii->app()->db->createCommand($sql);
+  $rows = $command->queryAll();
+  $result = [];
+  foreach ($rows as $row) {
+    $r = [];
+    foreach ($untranslatedFields as $f) {
+      $r[$f] = idx($row, $f);
+    };
+    foreach ($translatedFields as $f) {
+      $r[$f] = null;
+      foreach ($languages as $lang) {
+        $val = idx($row, $lang . "_" . $f);
+        if ($val !== null) {
+          $r[$f] = $val;
+          break;
+        };
+      };
+    };
+    $result[] = $r;
+  };
+  return $result;
+};
 class AppType extends ObjectType {
-  __construct() {
-    appLoader = new BatchedLoader(fn (appIds, emit) {
-      // rows = queryAll('festival', ['id'], ['title'], 'id IN (' + implode(',', appIds) + ') AND status=2')
-       foreach (rows as r) {
-       if (!r['title']) {
-       exit(r['id'])
-       }
-       emit(r['id'], [id: r['id'], title: r['title']])
-       }
-    }, false)
+  public function __construct() {
+    $appLoader = new BatchedLoader(function ($appIds, $emit) {
+      // rows = queryAll('festival', ['id'], ['title'], 'id IN (' + implode(',', appIds) + ') AND status=2');
+      foreach ($rows as $r) {
+        if (!$r['title']) {
+          exit($r['id']);
+        };
+        emit($r['id'], ["id" => $r['id'], "title" => $r['title']]);
+      };
+    }, false);
     /*    workLoader = new BatchedLoader(fn (array appIds, emit) {
       rows = queryAll('work', ['id', 'festivalId', 'taskName', 'result', 'requested', 'started', 'finished'], [], 'status = 2 AND festivalId IN (' + implode(',', appIds) + ')')
       foreach (rows as r) {
@@ -105,10 +90,10 @@ class AppType extends ObjectType {
     }], clients: [type: new ListOfType(MEATypes::client()), resolve: fn (app) {
       return clientLoader.load(app['id'])
     }]]]
-    parent::__construct(config)*/
+    parent::__construct(config)*/;
   }
-
-  toJSON(f) {
-    return [id: intval(f.id), title: f.translate("title", "en")]
+  public function toJSON($f) {
+    return ["id" => intval($f->id), "title" => $f->translate("title", "en")];
   }
 }
+?>
