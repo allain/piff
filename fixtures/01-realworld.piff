@@ -62,52 +62,127 @@ fn queryAll(
 class AppType extends ObjectType {
   __construct() {
     appLoader = new BatchedLoader(fn (appIds, emit) {
-      // rows = queryAll('festival', ['id'], ['title'], 'id IN (' + implode(',', appIds) + ') AND status=2')
-       foreach (rows as r) {
-       if (!r['title']) {
-       exit(r['id'])
-       }
-       emit(r['id'], [id: r['id'], title: r['title']])
-       }
-    }, false)
-    workLoader = new BatchedLoader(fn (array appIds, emit) {
-      rows = queryAll('work', ['id', 'festivalId', 'taskName', 'result', 'requested', 'started', 'finished'], [], 'status = 2 AND festivalId IN (' + implode(',', appIds) + ')')
+      /*rows = queryAll(
+        'festival',
+        ['id'],
+        ['title'],
+        'id IN (' + implode(',', appIds) + ') AND status=2'
+        )
+
       foreach (rows as r) {
-        emit(r['festivalId'], [id: r['id'], taskName: r['taskName'], status: r['result'], ts: r['finished']||r['started']||r['requested']])
+        if (!r["title"]) {
+          exit(r["id"])
+        }
+        emit(r["id"], [id: r["id"], title: r["title"]])
+      }
+      */
+    }, false)
+
+    workLoader = new BatchedLoader(fn (appIds, emit) {
+      rows = queryAll(
+        "work",
+        [
+          "id",
+          "festivalId",
+          "taskName",
+          "result",
+          "requested",
+          "started",
+          "finished"
+        ],
+        [],
+        "status = 2 AND festivalId IN (" + implode(",", appIds) + ")"
+      )
+      foreach (rows as r) {
+        emit(
+          r["festivalId"],
+          [
+            id: r["id"],
+            taskName: r["taskName"],
+            status: r["result"],
+            ts: r["finished"] || r["started"] || r["requested"]
+          ]
+        )
       }
     }, false)
 
-    favoriteLoader = new BatchedLoader(fn (array appIds, emit) {
-      command = Yii::app().db.createCommand('SELECT festivalId FROM tbl_favoriteFestival WHERE userId=:userId')
-      festivalIds = command.queryColumn([':userId': user().id])
+    favoriteLoader = new BatchedLoader(fn (appIds, emit) {
+      command = Yii.app().db.createCommand(
+        "SELECT festivalId FROM tbl_favoriteFestival WHERE userId=:userId"
+      )
+      festivalIds = command.queryColumn([":userId": user().id])
       foreach (festivalIds as festivalId) {
         emit(festivalId, true)
       }
     }, true, false)
 
-    childrenLoader = new BatchedLoader(fn (array appIds, emit) {
-      rows = queryAll('festival', ['parentId', 'id'], ['title'], 'parentId IN (' + implode(',', appIds) + ') AND status > 0')
+    childrenLoader = new BatchedLoader(fn (appIds, emit) {
+      rows = queryAll(
+        "festival",
+        ["parentId", "id"],
+        ["title"],
+        "parentId IN (" + implode(",", appIds) + ") AND status > 0"
+      )
       foreach (rows as r) {
-        emit(r['parentId'], [id: r['id'], title: r['title']])
+        emit(r["parentId"], [id: r["id"], title: r["title"]])
       }
     })
-    
-    clientLoader = new BatchedLoader(fn (array appIds, emit) {
-      rows = queryAll('client', ['id', 'festivalId', 'token', 'downloadUrl', 'version'], [], 'status = 2 AND festivalId IN (' + implode(',', appIds) + ')')
+
+    clientLoader = new BatchedLoader(fn (appIds, emit) {
+      rows = queryAll(
+        "client",
+        ["id", "festivalId", "token", "downloadUrl", "version"],
+        [],
+        "status = 2 AND festivalId IN (" + implode(",", appIds) + ")"
+      )
       foreach (rows as r) {
-        emit(r['festivalId'], [id: r['id'], festivalId: r['festivalId'], platform: r['token'], downloadUrl: r['downloadUrl'], version: r['version']])
+        emit(
+          r["festivalId"],
+          [
+            id: r["id"],
+            festivalId: r["festivalId"],
+            platform: r["token"],
+            downloadUrl: r["downloadUrl"],
+            version: r["version"]
+          ]
+        )
       }
     }, false)
-    config = [name: 'App', description: 'An app in the system', fields: [id: Type::nonNull(Type::int()), title: Type::nonNull(Type::string()), favorited: [type: Type::boolean(), resolve: fn (app) {
-      return favoriteLoader.load(app['id'])
-    }], workItems: [type: new ListOfType(MEATypes::work()), resolve: fn (app) {
-      return workLoader.load(app['id'])
-    }], children: [type: new ListOfType(this), resolve: fn (app) {
-      return childrenLoader.load(app['id'])
-    }], clients: [type: new ListOfType(MEATypes::client()), resolve: fn (app) {
-      return clientLoader.load(app['id'])
-    }]]]
-    parent::__construct(config)
+
+    config = [
+      name: "App",
+      description: "An app in the system",
+      fields: [
+        id: Type.nonNull(Type.int()),
+        title: Type.nonNull(Type.string()),
+        favorited: [
+          type: Type.boolean(),
+          resolve: fn (app) {
+            return favoriteLoader.load(app["id"])
+          }
+        ],
+        workItems: [
+          type: new ListOfType(MEATypes.work()),
+          resolve: fn (app) {
+            return workLoader.load(app["id"])
+          }
+        ],
+        children: [
+          type: new ListOfType(this),
+          resolve: fn (app) {
+            return childrenLoader.load(app["id"])
+          }
+        ],
+        clients: [
+          type: new ListOfType(MEATypes.client()),
+          resolve: fn (app) {
+            return clientLoader.load(app["id"])
+          }
+        ]
+      ]
+    ]
+
+    parent.__construct(config)
   }
 
   toJSON(f) {
