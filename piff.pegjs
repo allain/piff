@@ -42,7 +42,7 @@
 }
 
 Start
-  = __ program:Program __ { return program; }
+  = program:Program { return program; }
 
 // ----- Lexical Grammar -----
 
@@ -95,7 +95,7 @@ SingleLineComment
   }
 
 Identifier "id"
-  = !ReservedWord name:IdentifierName { return name; }
+  = !ReservedWord name: IdentifierName { return name; }
 
 Variable "var"
   = !ReservedWord name:IdentifierName {
@@ -122,11 +122,11 @@ ConstantPart
 
 
 IdentifierName "id"
-  = head:IdentifierStart tail:$IdentifierPart* {
+  = head:IdentifierStart tail: $ IdentifierPart* {
       return {
         type: "Identifier",
         name: head + tail
-      };
+      }
     }
 
 IdentifierStart
@@ -1022,7 +1022,7 @@ InterfaceMethodDeclaration
 MethodDeclaration
   = visibility: ( "private" __ /  "protected" __ / "public" __ )?
     abstract: ( "abstract" __ )?
-    id:Identifier __
+    id: Identifier __
     "(" __ params:(FormalParameterList __)? ")" __
     !"{"
     {
@@ -1056,7 +1056,7 @@ MethodDeclaration
     }
 
 ClassConstDeclaration
-  = name:$[A-Z_]+ __ "=" __ value:PrimaryExpression EOS {
+  = name: $ [A-Z_]+ __ "=" __ value:PrimaryExpression EOS {
     return {
       type: 'ClassConstDeclaration',
       name,
@@ -1238,8 +1238,8 @@ ClassElements
 ClassElement
   = ClassConstDeclaration
   / EmptyStatement
-  / PropertyDeclaration
   / MethodDeclaration
+  / PropertyDeclaration
 
 InterfaceElements
   = head:InterfaceElement tail:(__ InterfaceElement)* {

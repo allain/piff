@@ -70,7 +70,7 @@ class AppType extends ObjectType {
        emit(r['id'], [id: r['id'], title: r['title']])
        }
     }, false)
-    /*    workLoader = new BatchedLoader(fn (array appIds, emit) {
+    workLoader = new BatchedLoader(fn (array appIds, emit) {
       rows = queryAll('work', ['id', 'festivalId', 'taskName', 'result', 'requested', 'started', 'finished'], [], 'status = 2 AND festivalId IN (' + implode(',', appIds) + ')')
       foreach (rows as r) {
         emit(r['festivalId'], [id: r['id'], taskName: r['taskName'], status: r['result'], ts: r['finished']||r['started']||r['requested']])
@@ -84,12 +84,14 @@ class AppType extends ObjectType {
         emit(festivalId, true)
       }
     }, true, false)
+
     childrenLoader = new BatchedLoader(fn (array appIds, emit) {
       rows = queryAll('festival', ['parentId', 'id'], ['title'], 'parentId IN (' + implode(',', appIds) + ') AND status > 0')
       foreach (rows as r) {
         emit(r['parentId'], [id: r['id'], title: r['title']])
       }
     })
+    
     clientLoader = new BatchedLoader(fn (array appIds, emit) {
       rows = queryAll('client', ['id', 'festivalId', 'token', 'downloadUrl', 'version'], [], 'status = 2 AND festivalId IN (' + implode(',', appIds) + ')')
       foreach (rows as r) {
@@ -105,7 +107,7 @@ class AppType extends ObjectType {
     }], clients: [type: new ListOfType(MEATypes::client()), resolve: fn (app) {
       return clientLoader.load(app['id'])
     }]]]
-    parent::__construct(config)*/
+    parent::__construct(config)
   }
 
   toJSON(f) {
